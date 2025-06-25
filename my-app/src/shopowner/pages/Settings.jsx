@@ -1,16 +1,28 @@
 import React, { useState } from 'react';
-import { FaUserCircle, FaLock, FaBell, FaPalette, FaSignOutAlt } from 'react-icons/fa';
+import {
+  FaUserCircle,
+  FaLock,
+  FaBell,
+  FaPalette,
+  FaSignOutAlt,
+} from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import Navbar from "../../shopowner/components/SideNavbar";
-import shopownerImage from "../../assets/shopowner.jpg";
-import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../store/authStore";
-import axios from "axios";
-import ShopEditModal from "../components/ShopEdit";
+import Navbar from '../../shopowner/components/SideNavbar';
+import shopownerImage from '../../assets/shopowner.jpg';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
+import axios from 'axios';
+import ShopEditModal from '../components/ShopEdit';
+import ChangePassword from '../components/ChangePasswordModel';
+import UpdateProfile from '../components/UpdateProfileModel';
 
 const containerVariants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: 'easeOut' },
+  },
 };
 
 const buttonVariants = {
@@ -25,22 +37,27 @@ const buttonVariants = {
 function Settings() {
   const { logout } = useAuthStore();
   const navigate = useNavigate();
+
   const [shop, setShop] = useState(null);
   const [showShopEdit, setShowShopEdit] = useState(false);
   const [loadingShop, setLoadingShop] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showUpdateProfile, setShowUpdateProfile] = useState(false);
 
   const handleLogout = async () => {
     await logout();
-    navigate("/login");
+    navigate('/login');
   };
 
   const fetchShop = async () => {
     try {
       setLoadingShop(true);
-      const res = await axios.get("/api/shops/my-shop", { withCredentials: true });
+      const res = await axios.get('/api/shops/my-shop', {
+        withCredentials: true,
+      });
       setShop(res.data.shop);
     } catch (error) {
-      console.error("Failed to fetch shop", error);
+      console.error('Failed to fetch shop', error);
     } finally {
       setLoadingShop(false);
     }
@@ -49,37 +66,38 @@ function Settings() {
   const settingsOptions = [
     {
       icon: <FaUserCircle className="text-3xl text-blue-600" />,
-      title: "Profile",
-      description: "Update your shop information",
-      ringColor: "focus:ring-blue-500",
+      title: 'Profile',
+      description: 'Update your shop information',
+      ringColor: 'focus:ring-blue-500',
       onClick: async () => {
         await fetchShop();
-        setShowShopEdit(true);
-      }
+        setShowUpdateProfile(true);
+      },
     },
     {
       icon: <FaLock className="text-3xl text-purple-600" />,
-      title: "Change Password",
-      description: "Update your password regularly",
-      ringColor: "focus:ring-purple-500",
+      title: 'Change Password',
+      description: 'Update your password regularly',
+      ringColor: 'focus:ring-purple-500',
+      onClick: () => setShowChangePassword(true),
     },
     {
       icon: <FaBell className="text-3xl text-yellow-500" />,
-      title: "Notifications",
-      description: "Manage notification preferences",
-      ringColor: "focus:ring-yellow-400",
+      title: 'Notifications',
+      description: 'Manage notification preferences',
+      ringColor: 'focus:ring-yellow-400',
     },
     {
       icon: <FaPalette className="text-3xl text-pink-500" />,
-      title: "Theme",
-      description: "Switch between light and dark mode",
-      ringColor: "focus:ring-pink-500",
+      title: 'Theme',
+      description: 'Switch between light and dark mode',
+      ringColor: 'focus:ring-pink-500',
     },
     {
       icon: <FaSignOutAlt className="text-3xl text-red-600" />,
-      title: "Logout",
-      description: "Sign out of your account",
-      ringColor: "focus:ring-red-500",
+      title: 'Logout',
+      description: 'Sign out of your account',
+      ringColor: 'focus:ring-red-500',
       isLogout: true,
       onClick: handleLogout,
     },
@@ -92,6 +110,7 @@ function Settings() {
         alt="Background"
         className="absolute inset-0 w-full h-full object-cover opacity-20 -z-10"
       />
+
       <motion.div
         className="w-full max-w-3xl bg-white bg-opacity-90 rounded-xl shadow-xl p-10 backdrop-blur-md"
         variants={containerVariants}
@@ -109,18 +128,22 @@ function Settings() {
               initial="hidden"
               animate="visible"
               onClick={option.onClick}
-              disabled={loadingShop && option.title === "Profile"}
+              disabled={loadingShop && option.title === 'Profile'}
               className={`w-full flex items-center gap-6 p-5 rounded-lg hover:bg-gray-100 transition focus:outline-none focus:ring-2 ${option.ringColor} ${
                 option.isLogout ? 'hover:bg-red-50' : ''
               } disabled:opacity-70 disabled:cursor-not-allowed`}
             >
               {option.icon}
               <div className="text-left">
-                <p className={`text-lg font-semibold ${option.isLogout ? 'text-red-600' : 'text-gray-800'}`}>
+                <p
+                  className={`text-lg font-semibold ${
+                    option.isLogout ? 'text-red-600' : 'text-gray-800'
+                  }`}
+                >
                   {option.title}
                 </p>
                 <p className="text-sm text-gray-500">{option.description}</p>
-                {loadingShop && option.title === "Profile" && (
+                {loadingShop && option.title === 'Profile' && (
                   <span className="text-xs text-blue-500 mt-1">Loading shop data...</span>
                 )}
               </div>
@@ -128,13 +151,19 @@ function Settings() {
           ))}
         </div>
       </motion.div>
+
       <Navbar />
+
+      {/* ✅ Modals */}
       <AnimatePresence>
         {showShopEdit && shop && (
-          <ShopEditModal
-            shop={shop}
-            onClose={() => setShowShopEdit(false)}
-          />
+          <ShopEditModal shop={shop} onClose={() => setShowShopEdit(false)} />
+        )}
+        {showUpdateProfile && shop && (
+          <UpdateProfile shop={shop} onClose={() => setShowUpdateProfile(false)} />
+        )}
+        {showChangePassword && (
+          <ChangePassword onClose={() => setShowChangePassword(false)} />
         )}
       </AnimatePresence>
     </div>

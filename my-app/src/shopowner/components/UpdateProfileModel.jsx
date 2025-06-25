@@ -1,7 +1,42 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { FaUser, FaEnvelope } from 'react-icons/fa';
 import { useAuthStore } from '../store/authStore';
+
+const backdrop = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+  exit: { opacity: 0 }
+};
+
+const modal = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 100, damping: 15 }
+  },
+  exit: { opacity: 0, y: 30 }
+};
+
+const InputField = ({ icon: Icon, label, type, value, onChange }) => (
+  <div className="w-full">
+    <label className="block text-sm font-semibold text-gray-700 mb-1">{label}</label>
+    <div className="relative">
+      <span className="absolute inset-y-0 left-3 flex items-center text-purple-400">
+        <Icon />
+      </span>
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        required
+        className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-300 rounded-full shadow-inner focus:outline-none focus:ring-2 focus:ring-teal-400 transition"
+      />
+    </div>
+  </div>
+);
 
 const UpdateProfileModal = ({ onClose }) => {
   const { user, updateProfile, isLoading } = useAuthStore();
@@ -14,63 +49,60 @@ const UpdateProfileModal = ({ onClose }) => {
     e.preventDefault();
     try {
       await updateProfile(formData.name, formData.email);
-      toast.success('Profile updated successfully');
+      toast.success('🎉 Profile updated successfully');
       onClose();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Profile update failed");
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Update failed');
     }
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-gradient-to-br from-purple-200 via-gray-100 to-teal-100 bg-opacity-80 backdrop-blur-md z-50 flex items-center justify-center px-4"
+      variants={backdrop}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
       onClick={onClose}
     >
       <motion.div
-        initial={{ y: 50 }}
-        animate={{ y: 0 }}
-        className="bg-white rounded-xl p-6 w-full max-w-md"
+        variants={modal}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
         onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl"
       >
-        <h3 className="text-xl font-bold mb-4">Update Profile</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Name</label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={e => setFormData({ ...formData, name: e.target.value })}
-              className="w-full p-2 border rounded-md"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              value={formData.email}
-              onChange={e => setFormData({ ...formData, email: e.target.value })}
-              className="w-full p-2 border rounded-md"
-              required
-            />
-          </div>
-          <div className="flex justify-end space-x-3">
+        <h2 className="text-2xl font-bold text-center text-purple-700 mb-6">Update Profile </h2>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <InputField
+            icon={FaUser}
+            label="Name"
+            type="text"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+          <InputField
+            icon={FaEnvelope}
+            label="Email"
+            type="email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          />
+          <div className="flex justify-between gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 border rounded-md"
+              className="w-full py-2 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-100 font-medium transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-50"
+              className="w-full py-2 rounded-full bg-gradient-to-r from-purple-500 to-teal-400 text-white font-semibold hover:opacity-90 transition disabled:opacity-50"
             >
-              {isLoading ? 'Updating...' : 'Update Profile'}
+              {isLoading ? 'Saving...' : 'Update'}
             </button>
           </div>
         </form>

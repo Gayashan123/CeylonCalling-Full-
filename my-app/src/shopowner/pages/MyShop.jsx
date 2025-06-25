@@ -129,130 +129,126 @@ const MyShop = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f0f2f5] text-[#050505]">
-      <div className="max-w-5xl mx-auto px-4 py-6">
-        {/* Shop Header */}
-        <motion.div
-          className="bg-white shadow-md rounded-lg p-4 flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-6"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <img
-            src={getDisplayImage(shop.photo)}
-            alt="Shop"
-            className="rounded-md w-full sm:w-1/3 h-48 object-cover"
-          />
-          <div className="flex-1 text-center sm:text-left">
-            <h1 className="text-2xl font-bold">{shop.name}</h1>
-            <p className="text-sm text-gray-600 mt-1">📞 {shop.contact}</p>
-            <button
-              onClick={() => setShowShopEdit(true)}
-              className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              <FaEdit className="inline mr-2" /> Edit Profile
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Search + Filter */}
-        <motion.div
-          className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          <div className="relative w-full md:w-1/3">
-            <FaSearch className="absolute top-3 left-3 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search food..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    <div className="min-h-screen bg-gradient-to-br from-[#f7f8fa] to-[#eef1f6] text-[#1f2937]">
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        <motion.div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <img
+              src={getDisplayImage(shop.photo)}
+              alt="Shop"
+              className="w-12 h-12 rounded-full object-cover shadow-md"
             />
+            <h1 className="text-2xl font-bold tracking-tight">{shop.name}</h1>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {["All", ...allCategoryNames].map((cat) => (
-              <motion.div key={cat} className="flex items-center" whileHover={{ scale: 1.05 }}>
-                <button
-                  onClick={() => {
-                    setSelectedCategory(cat);
-                    setCurrentPage(1);
-                  }}
-                  className={`px-4 py-1 rounded-full text-sm font-medium border ${
-                    selectedCategory === cat
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-white text-gray-800 border-gray-300 hover:bg-blue-100"
-                  }`}
-                >
-                  {cat}
-                </button>
-                {cat !== "All" && (
-                  <button
-                    className="ml-1 text-red-600 hover:text-red-800"
-                    onClick={() => handleDeleteCategory(cat)}
-                    title="Delete category"
-                  >
-                    <FaTrash />
-                  </button>
-                )}
-              </motion.div>
-            ))}
-          </div>
+          <button
+            onClick={() => setShowShopEdit(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:scale-105 transition"
+          >
+            <FaEdit /> Edit Profile
+          </button>
         </motion.div>
 
-        {/* Food Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Search & Filters */}
+        <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-lg p-6 mb-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="relative w-full md:w-1/3">
+              <FaSearch className="absolute top-3 left-3 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search food..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {["All", ...allCategoryNames].map((cat) => (
+                <motion.div key={cat} className="flex items-center" whileHover={{ scale: 1.05 }}>
+                  <button
+                    onClick={() => {
+                      setSelectedCategory(cat);
+                      setCurrentPage(1);
+                    }}
+                    className={`px-4 py-1 rounded-full text-sm font-medium border ${
+                      selectedCategory === cat
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "bg-white/60 text-gray-800 border-gray-300 hover:bg-blue-100"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                  {cat !== "All" && (
+                    <button
+                      className="ml-1 text-red-600 hover:text-red-800"
+                      onClick={() => handleDeleteCategory(cat)}
+                      title="Delete category"
+                    >
+                      <FaTrash />
+                    </button>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+                   {/* Food Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {currentFoods.map((food, index) => (
             <motion.div
               key={food._id}
-              className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition"
+              className="relative group rounded-3xl bg-white/60 backdrop-blur-lg border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden hover:ring-2 hover:ring-blue-200"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
             >
-              <img
-                src={getDisplayImage(food.picture)}
-                alt={food.name}
-                className="rounded-md w-full h-40 object-cover mb-2"
-              />
-              <h3 className="font-bold text-lg mb-1">{food.name}</h3>
-              <p className="text-sm text-gray-500 mb-1">{food.category?.name}</p>
-              <p className="text-blue-600 font-semibold text-lg">Rs.{parseFloat(food.price).toFixed(2)}</p>
-              <div className="flex justify-between mt-3 text-sm">
-                <button
-                  onClick={() => setEditingFood(food)}
-                  className="text-blue-600 hover:underline flex items-center"
-                >
-                  <FaEdit className="mr-1" /> Edit
-                </button>
-                <button
-                  onClick={() => handleDeleteFood(food._id)}
-                  className="text-red-600 hover:underline flex items-center"
-                >
-                  <FaTrash className="mr-1" /> Delete
-                </button>
+              <div className="relative w-full h-44 overflow-hidden rounded-t-3xl">
+                <img
+                  src={getDisplayImage(food.picture)}
+                  alt={food.name}
+                  className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500 ease-in-out"
+                />
+                {food.category?.name && (
+                  <span className="absolute top-3 left-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs px-3 py-1 rounded-full shadow">
+                    {food.category.name}
+                  </span>
+                )}
+              </div>
+              <div className="px-5 py-4">
+                <h3 className="text-lg font-semibold text-gray-800 truncate">{food.name}</h3>
+                <p className="text-base font-bold text-blue-600 mt-1">Rs.{parseFloat(food.price).toFixed(2)}</p>
+                <div className="mt-4 flex justify-between items-center text-sm">
+                  <button
+                    onClick={() => setEditingFood(food)}
+                    className="flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-all"
+                  >
+                    <FaEdit /> Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteFood(food._id)}
+                    className="flex items-center gap-1 text-red-600 hover:text-red-800 transition-all"
+                  >
+                    <FaTrash /> Delete
+                  </button>
+                </div>
               </div>
             </motion.div>
           ))}
         </div>
 
+
+
         {/* Pagination */}
         {totalPages > 1 && (
-          <motion.div
-            className="mt-6 flex justify-center gap-2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
+          <motion.div className="mt-8 flex justify-center gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentPage(i + 1)}
-                className={`px-4 py-1 rounded-md text-sm font-medium ${
+                className={`px-4 py-1 rounded-full text-sm font-medium ${
                   currentPage === i + 1
                     ? "bg-blue-600 text-white"
                     : "bg-white border border-gray-300 hover:bg-blue-50"
@@ -264,12 +260,11 @@ const MyShop = () => {
           </motion.div>
         )}
 
-        {/* Navigation */}
+        {/* Navigation & Modals */}
         <div className="mt-10">
           <Navigation />
         </div>
 
-        {/* Modals */}
         {editingFood && (
           <EditFood
             food={editingFood}
@@ -280,9 +275,7 @@ const MyShop = () => {
         )}
 
         <AnimatePresence>
-          {showShopEdit && shop && (
-            <ShopEditModal shop={shop} onClose={() => setShowShopEdit(false)} />
-          )}
+          {showShopEdit && shop && <ShopEditModal shop={shop} onClose={() => setShowShopEdit(false)} />}
         </AnimatePresence>
       </div>
     </div>

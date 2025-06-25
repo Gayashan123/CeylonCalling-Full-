@@ -1,26 +1,25 @@
-// File: components/ShopEditModal.jsx
 import React, { useState } from 'react';
 import { FaCamera, FaTimes } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+
+const backdropVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.2 } },
+};
 
 const modalVariants = {
   hidden: { y: "100%", opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
-    transition: { type: "spring", damping: 25, stiffness: 200 },
+    transition: { type: "spring", damping: 20, stiffness: 200 },
   },
   exit: {
     y: "100%",
     opacity: 0,
     transition: { duration: 0.3 },
   },
-};
-
-const backdropVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.2 } },
 };
 
 export default function ShopEditModal({ shop, onClose }) {
@@ -52,23 +51,23 @@ export default function ShopEditModal({ shop, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMsg("");
     setSuccessMsg("");
+    setErrorMsg("");
     try {
       const formData = new FormData();
-      Object.entries(form).forEach(([key, value]) => formData.append(key, value));
+      Object.entries(form).forEach(([key, val]) => formData.append(key, val));
       if (photo) formData.append("photo", photo);
       await axios.put(`/api/shops/${shop._id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
-      setSuccessMsg("Shop updated successfully!");
+      setSuccessMsg("✅ Shop updated!");
       setTimeout(() => {
         setSuccessMsg("");
         onClose();
-      }, 1500);
+      }, 1200);
     } catch (err) {
-      setErrorMsg(err.response?.data?.error || "Update failed");
+      setErrorMsg(err.response?.data?.error || "Update failed.");
     } finally {
       setLoading(false);
     }
@@ -77,194 +76,113 @@ export default function ShopEditModal({ shop, onClose }) {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 flex mb-8 items-end sm:items-center justify-center"
+        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
         variants={backdropVariants}
         initial="hidden"
         animate="visible"
         exit="hidden"
       >
-        {/* Backdrop */}
-        <div
-          className="fixed inset-0 bg-transparent bg-opacity-30 backdrop-blur-sm"
-          onClick={onClose}
-          aria-hidden="true"
-        />
-
-        {/* Modal */}
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-md" onClick={onClose} />
         <motion.div
-          className="relative w-full max-w-[95vw] sm:max-w-[480px] bg-white rounded-3xl shadow-lg p-4 sm:p-8 z-50 font-sf-pro text-gray-900"
+          className="relative w-full max-w-lg mx-auto bg-white/80 backdrop-blur-lg rounded-3xl p-6 sm:p-8 shadow-xl z-50"
           variants={modalVariants}
           initial="hidden"
           animate="visible"
           exit="exit"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="shop-edit-title"
-          style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif' }}
+          onClick={(e) => e.stopPropagation()}
         >
-          {/* Close Button */}
+          {/* Close */}
           <button
             onClick={onClose}
-            aria-label="Close modal"
             className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition"
+            aria-label="Close"
           >
             <FaTimes className="text-gray-600 w-5 h-5" />
           </button>
 
-          {/* Title */}
-          <h2
-            id="shop-edit-title"
-            className="text-lg sm:text-2xl font-semibold text-center mb-6 select-none"
-          >
-            Edit Your Shop Profile
-          </h2>
+          <h2 className="text-center text-2xl font-bold text-purple-700 mb-6">Edit Shop Profile</h2>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Profile Image */}
-            <div className="flex justify-center mb-6">
-              <label className="cursor-pointer relative group rounded-full shadow-inner ring-1 ring-gray-200 w-20 h-20 sm:w-24 sm:h-24 overflow-hidden bg-gray-50">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Image Upload */}
+            <div className="flex justify-center">
+              <label className="relative group w-24 h-24 rounded-full overflow-hidden ring-2 ring-teal-400 shadow-inner cursor-pointer">
                 {preview ? (
-                  <img
-                    src={preview}
-                    alt="Shop preview"
-                    className="w-full h-full object-cover"
-                    draggable={false}
-                  />
+                  <img src={preview} alt="Preview" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="flex items-center justify-center w-full h-full text-gray-400">
-                    <FaCamera className="w-6 h-6 sm:w-6 sm:h-6" />
+                  <div className="flex items-center justify-center h-full text-gray-400">
+                    <FaCamera className="text-2xl" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-black bg-opacity-20 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                  <FaCamera className="text-white w-5 h-5" />
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                  <FaCamera className="text-white text-xl" />
                 </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handlePhotoChange}
-                  aria-label="Upload shop photo"
-                />
+                <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
               </label>
             </div>
 
-            {/* Responsive grid: 1 column on xs, 2 columns on sm+ */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {/* Left Column */}
-              <div className="flex flex-col space-y-5">
-                {[ 
-                  { name: "name", label: "Shop Name", required: true },
-                  { name: "location", label: "Location", required: true },
-                  { name: "priceRange", label: "Price Range" },
-                ].map(({ name, label, required }) => (
-                  <div key={name} className="flex flex-col">
-                    <label
-                      htmlFor={name}
-                      className="mb-1 text-sm sm:text-base font-medium text-gray-700"
-                    >
-                      {label}
-                      {required && <span className="text-red-500 ml-1">*</span>}
-                    </label>
-                    <input
-                      id={name}
-                      name={name}
-                      value={form[name]}
-                      onChange={handleChange}
-                      required={required}
-                      className="rounded-xl border border-gray-300 bg-gray-50 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                      autoComplete="off"
-                      spellCheck={false}
-                      type="text"
-                      inputMode="text"
-                    />
-                  </div>
-                ))}
-              </div>
+            {/* Grid Fields */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                { label: "Shop Name", name: "name", required: true },
+                { label: "Location", name: "location", required: true },
+                { label: "Price Range", name: "priceRange" },
+                { label: "Active Hours", name: "activeTime" },
+                { label: "Contact", name: "contact", required: true },
+              ].map(({ label, name, required }) => (
+                <div key={name}>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">
+                    {label}{required && <span className="text-red-500">*</span>}
+                  </label>
+                  <input
+                    name={name}
+                    value={form[name]}
+                    onChange={handleChange}
+                    required={required}
+                    className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm bg-white shadow-inner focus:outline-none focus:ring-2 focus:ring-teal-400"
+                  />
+                </div>
+              ))}
 
-              {/* Right Column */}
-              <div className="flex flex-col space-y-5">
-                {[
-                  { name: "activeTime", label: "Active Hours" },
-                  { name: "contact", label: "Contact Number", required: true },
-                  { name: "shopType", label: "Shop Type", isSelect: true },
-                ].map(({ name, label, required, isSelect }) => (
-                  <div key={name} className="flex flex-col">
-                    <label
-                      htmlFor={name}
-                      className="mb-1 text-sm sm:text-base font-medium text-gray-700"
-                    >
-                      {label}
-                      {required && <span className="text-red-500 ml-1">*</span>}
-                    </label>
-                    {isSelect ? (
-                      <select
-                        id={name}
-                        name={name}
-                        value={form[name]}
-                        onChange={handleChange}
-                        className="rounded-xl border border-gray-300 bg-gray-50 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                        aria-label="Select shop type"
-                      >
-                        <option value="restaurant">Restaurant</option>
-                        <option value="small_food_shop">Small Food Shop</option>
-                        <option value="hotel">Hotel</option>
-                      </select>
-                    ) : (
-                      <input
-                        id={name}
-                        name={name}
-                        value={form[name]}
-                        onChange={handleChange}
-                        required={required}
-                        className="rounded-xl border border-gray-300 bg-gray-50 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                        autoComplete="off"
-                        spellCheck={false}
-                        type="text"
-                        inputMode="text"
-                      />
-                    )}
-                  </div>
-                ))}
+              {/* Shop Type */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Shop Type</label>
+                <select
+                  name="shopType"
+                  value={form.shopType}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm bg-white shadow-inner focus:outline-none focus:ring-2 focus:ring-purple-400"
+                >
+                  <option value="restaurant">Restaurant</option>
+                  <option value="small_food_shop">Small Food Shop</option>
+                  <option value="hotel">Hotel</option>
+                </select>
               </div>
             </div>
 
-            {/* Description - full width */}
-            <div className="flex flex-col">
-              <label
-                htmlFor="description"
-                className="mb-1 text-sm sm:text-base font-medium text-gray-700"
-              >
-                Description
-              </label>
+            {/* Description */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Description</label>
               <textarea
-                id="description"
                 name="description"
+                rows="3"
                 value={form.description}
                 onChange={handleChange}
-                rows="3"
-                placeholder="Write something about your shop..."
-                className="rounded-xl border border-gray-300 bg-gray-50 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition resize-none"
-                spellCheck={false}
+                className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm bg-white shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-teal-400"
+                placeholder="Tell something about your shop..."
               />
             </div>
 
             {/* Messages */}
-            {successMsg && (
-              <p className="text-green-600 text-center font-medium">{successMsg}</p>
-            )}
-            {errorMsg && (
-              <p className="text-red-600 text-center font-medium">{errorMsg}</p>
-            )}
+            {successMsg && <p className="text-green-600 text-center">{successMsg}</p>}
+            {errorMsg && <p className="text-red-500 text-center">{errorMsg}</p>}
 
-            {/* Submit Button */}
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 py-3 text-white font-semibold shadow-md hover:from-blue-700 hover:to-blue-600 transition disabled:opacity-60"
-              aria-busy={loading}
+              className="w-full py-3 rounded-full bg-gradient-to-r from-purple-500 to-teal-400 text-white font-semibold hover:opacity-90 transition disabled:opacity-50"
             >
-              {loading ? "Saving..." : "Save Changes"}
+              {loading ? "Saving..." : "Update Shop"}
             </button>
           </form>
         </motion.div>
