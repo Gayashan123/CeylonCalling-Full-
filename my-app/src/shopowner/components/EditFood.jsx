@@ -36,7 +36,7 @@ const EditFood = ({ food, onClose, onUpdate, onDelete }) => {
       if (newImage) {
         formData.append("picture", newImage);
       } else if (imageRemoved) {
-        formData.append("picture", ""); // Indicate to backend to remove the image
+        formData.append("picture", ""); // Signal backend to remove image
       }
 
       const res = await fetch(`/api/food/${food._id}`, {
@@ -49,7 +49,7 @@ const EditFood = ({ food, onClose, onUpdate, onDelete }) => {
 
       const updatedFood = await res.json();
       onUpdate(updatedFood);
-    } catch (err) {
+    } catch {
       alert("Failed to update food item.");
     } finally {
       setLoading(false);
@@ -57,41 +57,63 @@ const EditFood = ({ food, onClose, onUpdate, onDelete }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 relative">
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50 p-4"
+      style={{
+        backdropFilter: "blur(20px)",
+        backgroundColor: "rgba(255 255 255 / 0.7)",
+        WebkitBackdropFilter: "blur(20px)",
+      }}
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="edit-food-title"
+    >
+      <div
+        className="bg-white rounded-3xl shadow-xl p-6 max-w-xs w-full sm:max-w-md sm:w-[90vw] md:max-w-lg relative"
+        style={{
+          fontFamily:
+            "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif",
+        }}
+      >
+        {/* Close button */}
         <button
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700"
           onClick={onClose}
-          aria-label="Close"
+          aria-label="Close Edit Food Modal"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-full p-2 transition"
         >
-          <FaTimes className="text-2xl" />
+          <FaTimes size={24} />
         </button>
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+
+        <h2
+          id="edit-food-title"
+          className="text-center text-xl sm:text-2xl font-semibold text-[#1c1c1e] mb-6"
+        >
           Edit Food Item
         </h2>
-        <div className="mb-6 flex flex-col items-center">
-          <div className="relative group">
-            <div className="w-40 h-40 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200 shadow-sm">
-              {preview ? (
-                <img
-                  src={preview}
-                  alt="Food preview"
-                  className="object-cover w-full h-full"
-                />
-              ) : (
-                <FaImage className="text-gray-300 text-6xl" />
-              )}
-            </div>
+
+        {/* Image preview */}
+        <div className="flex flex-col items-center sm:items-start">
+          <div className="relative group rounded-xl overflow-hidden w-28 h-28 sm:w-36 sm:h-36 bg-gray-100 shadow-md border border-gray-300 flex items-center justify-center">
+            {preview ? (
+              <img
+                src={preview}
+                alt="Food preview"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <FaImage className="text-gray-300 text-5xl sm:text-6xl" />
+            )}
             {preview && (
               <button
-                className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 hover:bg-red-600 transition"
                 onClick={handleRemoveImage}
-                title="Remove image"
+                aria-label="Remove Image"
+                className="absolute top-2 right-2 bg-black bg-opacity-30 hover:bg-opacity-60 text-white rounded-full p-1.5 transition"
               >
-                <FaTrash className="text-base" />
+                <FaTrash size={16} />
               </button>
             )}
           </div>
+
           <input
             type="file"
             accept="image/*"
@@ -101,59 +123,68 @@ const EditFood = ({ food, onClose, onUpdate, onDelete }) => {
           />
           <button
             type="button"
-            className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition flex items-center gap-2"
             onClick={() => fileInputRef.current && fileInputRef.current.click()}
+            className="mt-4 bg-[#007AFF] hover:bg-[#005BBB] text-white rounded-xl px-5 py-3 font-semibold shadow-md flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-[#007AFF] transition"
           >
-            <FaImage />
+            <FaImage size={18} />
             {preview ? "Change Image" : "Upload Image"}
           </button>
         </div>
-        <div className="mb-4">
-          <label className="block mb-1 text-sm font-medium text-gray-700">
-            Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-purple-400 outline-none"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            autoFocus
-          />
+
+        {/* Inputs container */}
+        <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:space-x-6">
+          <div className="flex-1">
+            <label className="block text-gray-700 font-medium mb-1">
+              Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              autoFocus
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-inner focus:ring-2 focus:ring-[#007AFF] focus:border-transparent outline-none text-lg"
+              placeholder="Enter food name"
+            />
+          </div>
+
+          <div className="flex-1">
+            <label className="block text-gray-700 font-medium mb-1">
+              Price (Rs) <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              value={price}
+              min="0"
+              step="0.01"
+              onChange={(e) => setPrice(e.target.value)}
+              required
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 shadow-inner focus:ring-2 focus:ring-[#007AFF] focus:border-transparent outline-none text-lg"
+              placeholder="Enter price"
+            />
+          </div>
         </div>
-        <div className="mb-6">
-          <label className="block mb-1 text-sm font-medium text-gray-700">
-            Price (Rs) <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="number"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-purple-400 outline-none"
-            value={price}
-            min={0}
-            step={0.01}
-            onChange={(e) => setPrice(e.target.value)}
-            required
-          />
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between mt-8">
+
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-between mt-10">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-600 bg-white hover:bg-gray-50 font-medium transition"
             disabled={loading}
+            className="flex-1 py-3 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#007AFF] transition"
           >
             Cancel
           </button>
           <button
             onClick={handleUpdate}
-            className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 shadow transition"
             disabled={loading}
+            className="flex-1 py-3 rounded-xl bg-[#007AFF] text-white font-semibold shadow-md hover:bg-[#005BBB] focus:outline-none focus:ring-2 focus:ring-[#005BBB] transition"
           >
             {loading ? "Saving..." : "Save Changes"}
           </button>
           <button
             onClick={() => onDelete(food._id)}
-            className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 shadow transition"
             disabled={loading}
+            className="flex-1 py-3 rounded-xl bg-red-600 text-white font-semibold shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-700 transition"
           >
             Delete
           </button>
