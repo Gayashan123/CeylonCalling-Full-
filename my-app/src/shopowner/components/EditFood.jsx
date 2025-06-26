@@ -1,14 +1,42 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { FaTrash, FaImage, FaTimes } from "react-icons/fa";
 
 const EditFood = ({ food, onClose, onUpdate, onDelete }) => {
   const [name, setName] = useState(food.name);
   const [price, setPrice] = useState(food.price);
+  const [categoryId, setCategoryId] = useState(
+    food.categoryId?.toString() ||
+    food.category?._id?.toString() ||
+    ""
+  );
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [categoriesError, setCategoriesError] = useState("");
   const [imageRemoved, setImageRemoved] = useState(false);
   const [preview, setPreview] = useState(food.picture || "");
   const [newImage, setNewImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef();
+
+  // Load categories for the select dropdown
+  useEffect(() => {
+    setLoadingCategories(true);
+    fetch("/api/categories/my-shop", { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => {
+        setCategories(data);
+        setLoadingCategories(false);
+        // If initial category is missing, set to the first category
+        if (!categoryId && data.length > 0) {
+          setCategoryId(data[0]._id.toString());
+        }
+      })
+      .catch(() => {
+        setCategoriesError("Failed to load categories.");
+        setLoadingCategories(false);
+      });
+    // eslint-disable-next-line
+  }, []);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -32,21 +60,18 @@ const EditFood = ({ food, onClose, onUpdate, onDelete }) => {
       const formData = new FormData();
       formData.append("name", name);
       formData.append("price", price);
-
+      formData.append("categoryId", categoryId);
       if (newImage) {
         formData.append("picture", newImage);
       } else if (imageRemoved) {
         formData.append("picture", ""); // Signal backend to remove image
       }
-
       const res = await fetch(`/api/food/${food._id}`, {
         method: "PUT",
         body: formData,
         credentials: "include",
       });
-
       if (!res.ok) throw new Error("Failed to update food item");
-
       const updatedFood = await res.json();
       onUpdate(updatedFood);
     } catch {
@@ -163,6 +188,33 @@ const EditFood = ({ food, onClose, onUpdate, onDelete }) => {
               placeholder="Enter price"
             />
           </div>
+        </div>
+
+        {/* Category select */}
+        <div className="mt-5">
+          <label className="block mb-1 text-gray-700 font-medium">Category <span className="text-red-500">*</span></label>
+          {loadingCategories ? (
+            <div className="text-sm text-gray-500">Loading categories...</div>
+          ) : categoriesError ? (
+            <div className="text-sm text-red-500">{categoriesError}</div>
+          ) : (
+            <select
+              name="categoryId"
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              required
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none bg-gray-50"
+            >
+              <option value="" disabled>
+                Select a category
+              </option>
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat._id.toString()}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         {/* Buttons */}

@@ -38,6 +38,28 @@ router.post("/", sessionAuth, async (req, res) => {
   }
 });
 
+
+router.put("/:id", sessionAuth, async (req, res) => {
+  try {
+    // ...your update logic...
+    const food = await Food.findByIdAndUpdate(
+      req.params.id,
+      {
+        name: req.body.name,
+        price: req.body.price,
+        category: req.body.categoryId || null,
+        // handle image, etc...
+      },
+      { new: true }
+    ).populate("category"); // <--- this is crucial!
+
+    if (!food) return res.status(404).json({ error: "Food not found" });
+    res.json(food);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // DELETE: Remove a category by ID (PRIVATE)
 router.delete("/:id", sessionAuth, async (req, res) => {
   try {
@@ -51,5 +73,8 @@ router.delete("/:id", sessionAuth, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+
+
 
 export default router;

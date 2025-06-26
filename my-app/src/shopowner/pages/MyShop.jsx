@@ -78,10 +78,21 @@ const MyShop = () => {
   const currentFoods = filteredFoods.slice(indexOfFirstFood, indexOfLastFood);
   const totalPages = Math.ceil(filteredFoods.length / foodsPerPage);
 
-  const handleUpdateFood = (updated) => {
-    setFoods((prev) => prev.map((f) => (f._id === updated._id ? updated : f)));
-    setEditingFood(null);
-  };
+ const handleUpdateFood = (updated) => {
+  const updatedCategory =
+    categories.find(
+      (c) =>
+        c._id === updated.categoryId ||
+        (updated.category && c._id === updated.category._id)
+    ) || updated.category || null;
+
+  setFoods((prev) =>
+    prev.map((f) =>
+      f._id === updated._id ? { ...updated, category: updatedCategory } : f
+    )
+  );
+  setEditingFood(null);
+};
 
   const handleDeleteFood = async (id) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this food item?");

@@ -2,7 +2,7 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import { fileURLToPath } from "url";
-import FoodItem from "../models/Addfood.js"
+import FoodItem from "../models/Addfood.js";
 import Shop from "../models/Shop.js";
 import { sessionAuth } from "../middlewares/sessionAuth.js";
 
@@ -49,6 +49,7 @@ router.post("/", sessionAuth, upload.single("picture"), async (req, res) => {
     });
 
     await foodItem.save();
+    await foodItem.populate("category");
     res.status(201).json(foodItem);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -64,20 +65,21 @@ router.put("/:id", sessionAuth, upload.single("picture"), async (req, res) => {
     const updateData = {};
     if (req.body.name !== undefined) updateData.name = req.body.name;
     if (req.body.price !== undefined) updateData.price = req.body.price;
+    if (req.body.categoryId !== undefined) updateData.category = req.body.categoryId; // CRUCIAL LINE
 
-    // If file uploaded, use new path
     if (req.file) {
       updateData.picture = `/uploads/${req.file.filename}`;
     } else if (req.body.picture === "") {
-      // If explicitly set to empty string or removed, remove image
       updateData.picture = undefined;
     }
 
+    // CRUCIAL: populate category after update
     const updatedFood = await FoodItem.findOneAndUpdate(
       { _id: req.params.id, shop: shop._id },
       updateData,
       { new: true, runValidators: true }
-    );
+    ).populate("category");
+
     if (!updatedFood) {
       return res.status(404).json({ error: "Food item not found" });
     }

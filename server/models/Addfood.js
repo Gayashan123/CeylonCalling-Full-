@@ -9,7 +9,7 @@ const foodItemSchema = new mongoose.Schema(
       required: true,
     },
     price: { type: Number, required: true, min: 0 },
-    picture: { type: String },
+    picture: { type: String, trim: true }, // Optional: trim spaces
     shop: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Shop",
@@ -20,4 +20,5 @@ const foodItemSchema = new mongoose.Schema(
 );
 
 const FoodItem = mongoose.model("FoodItem", foodItemSchema);
+
 export default FoodItem;
