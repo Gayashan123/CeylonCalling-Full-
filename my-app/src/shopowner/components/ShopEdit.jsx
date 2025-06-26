@@ -84,7 +84,7 @@ export default function ShopEditModal({ shop, onClose }) {
       >
         <div className="fixed inset-0 bg-black/30 backdrop-blur-md" onClick={onClose} />
         <motion.div
-          className="relative w-full max-w-lg mx-auto bg-white/80 backdrop-blur-lg rounded-3xl p-6 sm:p-8 shadow-xl z-50"
+          className="relative w-full max-w-lg mx-auto bg-white/80 backdrop-blur-lg rounded-3xl p-4 sm:p-8 shadow-xl z-50"
           variants={modalVariants}
           initial="hidden"
           animate="visible"
@@ -94,34 +94,36 @@ export default function ShopEditModal({ shop, onClose }) {
           {/* Close */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition"
+            className="absolute top-2 right-2 sm:top-4 sm:right-4 p-2 rounded-full hover:bg-gray-100 transition"
             aria-label="Close"
           >
             <FaTimes className="text-gray-600 w-5 h-5" />
           </button>
 
-          <h2 className="text-center text-2xl font-bold text-purple-700 mb-6">Edit Shop Profile</h2>
+          <h2 className="text-center text-lg sm:text-2xl font-bold text-purple-700 mb-4 sm:mb-6 lowercase sm:normal-case">
+            edit shop profile
+          </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             {/* Image Upload */}
             <div className="flex justify-center">
-              <label className="relative group w-24 h-24 rounded-full overflow-hidden ring-2 ring-teal-400 shadow-inner cursor-pointer">
+              <label className="relative group w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden ring-2 ring-teal-400 shadow-inner cursor-pointer">
                 {preview ? (
                   <img src={preview} alt="Preview" className="w-full h-full object-cover" />
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-400">
-                    <FaCamera className="text-2xl" />
+                    <FaCamera className="text-xl sm:text-2xl" />
                   </div>
                 )}
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                  <FaCamera className="text-white text-xl" />
+                  <FaCamera className="text-white text-lg sm:text-xl" />
                 </div>
                 <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
               </label>
             </div>
 
             {/* Grid Fields */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {[
                 { label: "Shop Name", name: "name", required: true },
                 { label: "Location", name: "location", required: true },
@@ -130,7 +132,7 @@ export default function ShopEditModal({ shop, onClose }) {
                 { label: "Contact", name: "contact", required: true },
               ].map(({ label, name, required }) => (
                 <div key={name}>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">
+                  <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1 block lowercase sm:normal-case">
                     {label}{required && <span className="text-red-500">*</span>}
                   </label>
                   <input
@@ -138,19 +140,19 @@ export default function ShopEditModal({ shop, onClose }) {
                     value={form[name]}
                     onChange={handleChange}
                     required={required}
-                    className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm bg-white shadow-inner focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    className="w-full rounded-xl border border-gray-300 px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-white shadow-inner focus:outline-none focus:ring-2 focus:ring-teal-400"
                   />
                 </div>
               ))}
 
               {/* Shop Type */}
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Shop Type</label>
+                <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1 block lowercase sm:normal-case">shop type</label>
                 <select
                   name="shopType"
                   value={form.shopType}
                   onChange={handleChange}
-                  className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm bg-white shadow-inner focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="w-full rounded-xl border border-gray-300 px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-white shadow-inner focus:outline-none focus:ring-2 focus:ring-purple-400"
                 >
                   <option value="restaurant">Restaurant</option>
                   <option value="small_food_shop">Small Food Shop</option>
@@ -161,28 +163,28 @@ export default function ShopEditModal({ shop, onClose }) {
 
             {/* Description */}
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Description</label>
+              <label className="text-xs sm:text-sm font-medium text-gray-700 mb-1 block lowercase sm:normal-case">description</label>
               <textarea
                 name="description"
                 rows="3"
                 value={form.description}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm bg-white shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-teal-400"
-                placeholder="Tell something about your shop..."
+                className="w-full rounded-xl border border-gray-300 px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-white shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-teal-400"
+                placeholder="tell something about your shop..."
               />
             </div>
 
             {/* Messages */}
-            {successMsg && <p className="text-green-600 text-center">{successMsg}</p>}
-            {errorMsg && <p className="text-red-500 text-center">{errorMsg}</p>}
+            {successMsg && <p className="text-green-600 text-center text-xs sm:text-base">{successMsg}</p>}
+            {errorMsg && <p className="text-red-500 text-center text-xs sm:text-base">{errorMsg}</p>}
 
             {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-full bg-gradient-to-r from-purple-500 to-teal-400 text-white font-semibold hover:opacity-90 transition disabled:opacity-50"
+              className="w-full py-2 sm:py-3 rounded-full bg-gradient-to-r from-purple-500 to-teal-400 text-white font-semibold hover:opacity-90 transition disabled:opacity-50 text-xs sm:text-base lowercase sm:normal-case"
             >
-              {loading ? "Saving..." : "Update Shop"}
+              {loading ? "saving..." : "update shop"}
             </button>
           </form>
         </motion.div>

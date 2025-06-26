@@ -65,7 +65,7 @@ function Settings() {
 
   const settingsOptions = [
     {
-      icon: <FaUserCircle className="text-3xl text-blue-600" />,
+      icon: <FaUserCircle className="text-2xl sm:text-3xl text-blue-600" />,
       title: 'Profile',
       description: 'Update your shop information',
       ringColor: 'focus:ring-blue-500',
@@ -75,26 +75,26 @@ function Settings() {
       },
     },
     {
-      icon: <FaLock className="text-3xl text-purple-600" />,
+      icon: <FaLock className="text-2xl sm:text-3xl text-purple-600" />,
       title: 'Change Password',
       description: 'Update your password regularly',
       ringColor: 'focus:ring-purple-500',
       onClick: () => setShowChangePassword(true),
     },
     {
-      icon: <FaBell className="text-3xl text-yellow-500" />,
+      icon: <FaBell className="text-2xl sm:text-3xl text-yellow-500" />,
       title: 'Notifications',
       description: 'Manage notification preferences',
       ringColor: 'focus:ring-yellow-400',
     },
     {
-      icon: <FaPalette className="text-3xl text-pink-500" />,
+      icon: <FaPalette className="text-2xl sm:text-3xl text-pink-500" />,
       title: 'Theme',
       description: 'Switch between light and dark mode',
       ringColor: 'focus:ring-pink-500',
     },
     {
-      icon: <FaSignOutAlt className="text-3xl text-red-600" />,
+      icon: <FaSignOutAlt className="text-2xl sm:text-3xl text-red-600" />,
       title: 'Logout',
       description: 'Sign out of your account',
       ringColor: 'focus:ring-red-500',
@@ -104,7 +104,7 @@ function Settings() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-gray-50 flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <div className="relative min-h-screen bg-gray-50 flex flex-col justify-center items-center py-8 px-2 sm:py-12 sm:px-6 lg:px-8 overflow-hidden">
       <img
         src={shopownerImage}
         alt="Background"
@@ -112,13 +112,15 @@ function Settings() {
       />
 
       <motion.div
-        className="w-full max-w-3xl bg-white bg-opacity-90 rounded-xl shadow-xl p-10 backdrop-blur-md"
+        className="w-full max-w-lg sm:max-w-2xl md:max-w-3xl bg-white bg-opacity-90 rounded-xl shadow-xl p-5 sm:p-10 backdrop-blur-md"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <h2 className="text-3xl font-extrabold mb-10 text-gray-900 text-center">Settings</h2>
-        <div className="space-y-6">
+        <h2 className="text-xl sm:text-3xl font-extrabold mb-6 sm:mb-10 text-gray-900 text-center lowercase sm:normal-case">
+          settings
+        </h2>
+        <div className="space-y-3 sm:space-y-6">
           {settingsOptions.map((option, index) => (
             <motion.button
               key={option.title}
@@ -129,22 +131,22 @@ function Settings() {
               animate="visible"
               onClick={option.onClick}
               disabled={loadingShop && option.title === 'Profile'}
-              className={`w-full flex items-center gap-6 p-5 rounded-lg hover:bg-gray-100 transition focus:outline-none focus:ring-2 ${option.ringColor} ${
+              className={`w-full flex items-center gap-3 sm:gap-6 p-3 sm:p-5 rounded-lg hover:bg-gray-100 transition focus:outline-none focus:ring-2 ${option.ringColor} ${
                 option.isLogout ? 'hover:bg-red-50' : ''
               } disabled:opacity-70 disabled:cursor-not-allowed`}
             >
               {option.icon}
               <div className="text-left">
                 <p
-                  className={`text-lg font-semibold ${
+                  className={`text-sm sm:text-lg font-semibold ${
                     option.isLogout ? 'text-red-600' : 'text-gray-800'
-                  }`}
+                  } lowercase sm:normal-case`}
                 >
                   {option.title}
                 </p>
-                <p className="text-sm text-gray-500">{option.description}</p>
+                <p className="text-xs sm:text-sm text-gray-500 lowercase sm:normal-case">{option.description}</p>
                 {loadingShop && option.title === 'Profile' && (
-                  <span className="text-xs text-blue-500 mt-1">Loading shop data...</span>
+                  <span className="text-xs text-blue-500 mt-1 lowercase sm:normal-case">loading shop data...</span>
                 )}
               </div>
             </motion.button>

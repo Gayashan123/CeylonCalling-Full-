@@ -1,4 +1,3 @@
-// File: pages/ShopEditPage.jsx
 import React, { useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import axios from "axios";
@@ -27,32 +26,36 @@ const ShopEditPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f9fafa] flex flex-col items-center py-6 px-4 sm:px-8 relative font-sans">
+    <div className="min-h-screen bg-[#f9fafa] flex flex-col items-center py-6 px-2 sm:px-4 md:px-8 relative font-sans">
       {/* Back Button */}
-      <div className="w-full max-w-2xl mb-4">
+      <div className="w-full max-w-full sm:max-w-2xl mb-4">
         <button
           onClick={goBack}
-          className="flex items-center text-blue-600 hover:text-blue-800 transition text-sm sm:text-base"
+          className="flex items-center text-blue-600 hover:text-blue-800 transition text-xs sm:text-sm md:text-base lowercase sm:normal-case"
         >
           <FaArrowLeft className="mr-2" />
-          Back to Settings
+          back to settings
         </button>
       </div>
 
       {/* Heading */}
-      <div className="w-full max-w-2xl text-center mb-4">
-        <h1 className="text-2xl sm:text-3xl font-semibold text-gray-800">Edit Your Shop</h1>
-        <p className="text-sm text-gray-500">Update shop profile, image, and contact info</p>
+      <div className="w-full max-w-full sm:max-w-2xl text-center mb-4">
+        <h1 className="text-lg sm:text-2xl md:text-3xl font-semibold text-gray-800 lowercase sm:normal-case">
+          edit your shop
+        </h1>
+        <p className="text-xs sm:text-sm text-gray-500 lowercase sm:normal-case">
+          update shop profile, image, and contact info
+        </p>
       </div>
 
       {/* Shop Form */}
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+      <div className="w-full max-w-full sm:max-w-2xl bg-white rounded-2xl shadow-xl p-3 sm:p-6 md:p-8">
         {loading ? (
-          <p className="text-gray-500 text-center">Loading shop data...</p>
+          <p className="text-gray-500 text-center text-xs sm:text-base lowercase sm:normal-case">loading shop data...</p>
         ) : shop ? (
           <ShopEditModal shop={shop} onClose={goBack} />
         ) : (
-          <p className="text-red-500 text-center">Failed to load shop information.</p>
+          <p className="text-red-500 text-center text-xs sm:text-base lowercase sm:normal-case">failed to load shop information.</p>
         )}
       </div>
     </div>
