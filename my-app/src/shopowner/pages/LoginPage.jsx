@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Lock, Loader, Home } from "lucide-react"; // Import Home icon
+import { Mail, Lock, Loader, Eye, EyeOff, Home } from "lucide-react";
 import { Link } from "react-router-dom";
-import Input from "../components/Input";
 import { useAuthStore } from "../store/authStore";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const { login, isLoading, error } = useAuthStore();
 
   const handleLogin = async (e) => {
@@ -22,9 +22,8 @@ const LoginPage = () => {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-gray-100 to-gray-200 px-4"
     >
-      <div className="w-full max-w-md rounded-3xl bg-white/80 backdrop-blur-md shadow-2xl border border-gray-200 p-10 sm:p-12 relative">
-        
-        {/* Top Home Icon */}
+      <div className="w-full max-w-md rounded-3xl bg-white/80 backdrop-blur-xl shadow-2xl border border-gray-200 p-10 sm:p-12 relative">
+        {/* Home icon link */}
         <Link
           to="/shopform"
           className="absolute top-4 left-4 text-gray-600 hover:text-black transition"
@@ -38,28 +37,43 @@ const LoginPage = () => {
         </h1>
 
         <form onSubmit={handleLogin} className="space-y-6">
-          <Input
-            icon={Mail}
-            type="email"
-            placeholder="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="text-gray-900 placeholder-gray-400"
-            autoComplete="email"
-            required
-          />
+          {/* Email Input */}
+          <div className="relative">
+            <Mail className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
+              className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 text-gray-800 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+            />
+          </div>
 
-          <Input
-            icon={Lock}
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="text-gray-900 placeholder-gray-400"
-            autoComplete="current-password"
-            required
-          />
+          {/* Password Input with toggle */}
+          <div className="relative">
+            <Lock className="absolute left-3 top-3.5 text-gray-400 w-5 h-5" />
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+              className="w-full pl-10 pr-10 py-3 rounded-xl bg-gray-50 text-gray-800 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-800 focus:outline-none"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+          </div>
 
+          {/* Forgot password */}
           <div className="flex justify-end text-sm">
             <Link
               to="/forgot-password"
@@ -69,16 +83,20 @@ const LoginPage = () => {
             </Link>
           </div>
 
+          {/* Error */}
           {error && (
-            <p className="text-center text-red-500 font-medium">{error}</p>
+            <p className="text-center text-red-500 font-medium text-sm">
+              {error}
+            </p>
           )}
 
+          {/* Submit Button */}
           <motion.button
             whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileTap={{ scale: 0.97 }}
             type="submit"
             disabled={isLoading}
-            className="w-full bg-black text-white font-medium rounded-xl py-3 shadow-md hover:bg-gray-900 transition duration-300 flex justify-center items-center"
+            className="w-full bg-black text-white font-semibold rounded-xl py-3 shadow-md hover:bg-gray-900 transition duration-300 flex justify-center items-center"
           >
             {isLoading ? (
               <Loader className="w-6 h-6 animate-spin" />
@@ -88,7 +106,8 @@ const LoginPage = () => {
           </motion.button>
         </form>
 
-        <p className="mt-8 text-center text-gray-500">
+        {/* Footer */}
+        <p className="mt-8 text-center text-gray-500 text-sm">
           Don’t have an account?{" "}
           <Link
             to="/signup"
