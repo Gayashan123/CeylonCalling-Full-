@@ -26,41 +26,49 @@ if (!process.env.SESSION_SECRET) throw new Error("SESSION_SECRET is not set in .
 
 const app = express();
 
-// CORS for local dev (adjust for prod)
+// CORS configuration
 app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
+cors({
+origin: "http://localhost:5173",
+credentials: true,
+methods: ["GET", "POST", "PUT", "DELETE"],
+allowedHeaders: ["Content-Type", "Authorization"],
+})
 );
+
 app.use(express.json());
 app.use(cookieParser());
 
-// SESSION SETUP (MongoDB-backed)
+// Enhanced session configuration
 app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.DB_URL,
-      collectionName: "sessions",
-    }),
-    cookie: {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-      secure: false,       // FOR LOCAL DEV ONLY (set true for HTTPS in prod)
-      sameSite: "lax",     // FOR LOCAL DEV ONLY
-    },
-  })
+session({
+secret: process.env.SESSION_SECRET,
+resave: false,
+saveUninitialized: false,
+store: MongoStore.create({
+mongoUrl: process.env.DB_URL,
+collectionName: "sessions",
+ttl: 7 * 24 * 60 * 60, // 7 days
+}),
+cookie: {
+httpOnly: true,
+maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+secure: process.env.NODE_ENV === "production",
+sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+},
+})
 );
 
-// Uploads (for files/images)
+// Uploads directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Simple test endpoint
+// Test endpoint
 app.get("/", (req, res) => {
-  res.json({ hello: "World" });
+res.json({
+status: "Server running",
+session: req.session,
+user: req.user
+});
 });
 
 // API Routes
@@ -69,24 +77,32 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/food", foodRoutes);
 app.use("/api/auth", authRoutes);
 
-// Frontend (PRODUCTION ONLY)
+// Frontend serving (PRODUCTION ONLY)
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "/my-app/dist")));
-  app.get("/*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "my-app", "dist", "index.html"));
-  });
+const clientDistPath = path.join(__dirname, "../../client/dist"); // Adjusted path
+
+// Serve static assets
+app.use(express.static(clientDistPath));
+
+// Handle SPA routing
+app.get("*", (req, res) => {
+res.sendFile(path.join(clientDistPath, "index.html"));
+});
 }
 
 const PORT = process.env.PORT || 5000;
 
-// Startup: connect DB then start server
+// Connect to DB and start server
 connectDB()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`✅ Server running on http://localhost:${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error("❌ Failed to connect to DB, server not started.", err);
-    process.exit(1);
-  });
+.then(() => {
+app.listen(PORT, () => {
+console.log(`✅ Server running on http://localhost:${PORT}`);
+console.log(`✅ Session secret: ${process.env.SESSION_SECRET ? "Set" : "Missing!"}`);
+console.log(`✅ Serving static files from: ${path.join(__dirname, "../../client/dist")}`);
+});
+})
+.catch((err) => {
+console.error("❌ Failed to connect to DB, server not started.", err);
+process.exit(1);
+});
+
