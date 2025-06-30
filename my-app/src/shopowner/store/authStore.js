@@ -10,6 +10,7 @@ const SHOP_URL =
     ? "http://localhost:5000/api/shops"
     : "/api/shops";
 
+// Always send credentials (cookies)
 axios.defaults.withCredentials = true;
 
 export const useAuthStore = create((set, get) => ({
@@ -189,8 +190,7 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-
- changePassword: async (currentPassword, newPassword) => {
+  changePassword: async (currentPassword, newPassword) => {
     set({ isLoading: true, error: null, message: null });
     try {
       const response = await axios.post(`${API_URL}/change-password`, {
@@ -215,7 +215,7 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-   updateProfile: async (name, email) => {
+  updateProfile: async (name, email) => {
     set({ isLoading: true, error: null, message: null });
     try {
       const response = await axios.post(`${API_URL}/update-profile`, {
@@ -240,8 +240,4 @@ export const useAuthStore = create((set, get) => ({
       throw error;
     }
   },
-
-
-
 }));
-

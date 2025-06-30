@@ -7,10 +7,9 @@ import {
   FaInfoCircle,
 } from "react-icons/fa";
 
-function RestaurantCard({ shop, onViewMenu }) {
+function RestaurantCard({ shop, categories, onViewMenu }) {
   return (
     <div className="flex flex-col md:flex-row bg-white/70 backdrop-blur-lg border border-gray-100 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.05)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] transition-all duration-300 overflow-hidden w-full max-w-5xl mx-auto mt-8 group hover:scale-[1.01]">
-      
       {/* Image */}
       <div className="md:w-1/3 w-full h-48 sm:h-60 md:h-auto overflow-hidden">
         <img
@@ -43,16 +42,23 @@ function RestaurantCard({ shop, onViewMenu }) {
             </p>
           </div>
 
-          {/* Tags */}
+          {/* Category Tags */}
           <div className="flex flex-wrap mt-4 gap-2">
-            {[shop.category || "General", "Local", "Veg Friendly"].map((tag, index) => (
-              <span
-                key={index}
-                className="bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 text-xs px-3 py-1 rounded-full shadow-sm hover:scale-105 transition"
-              >
-                {tag}
-              </span>
-            ))}
+            {categories.length > 0
+              ? categories.map((cat) => (
+                  <span
+                    key={cat._id}
+                    className="bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 text-xs px-3 py-1 rounded-full shadow-sm hover:scale-105 transition"
+                  >
+                    {cat.name}
+                  </span>
+                ))
+              : (
+                <span className="bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full">
+                  No categories
+                </span>
+              )
+            }
           </div>
         </div>
 

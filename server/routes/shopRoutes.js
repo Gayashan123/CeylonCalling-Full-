@@ -15,6 +15,16 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// --- NEW PUBLIC ENDPOINT ---
+router.get("/all", async (req, res) => {
+  try {
+    const shops = await Shop.find().select("-owner -reviews"); // Exclude sensitive info if needed
+    res.json({ shops });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch shops" });
+  }
+});
+
 // GET: Get the current user's shop (PRIVATE)
 router.get("/my-shop", sessionAuth, async (req, res) => {
   try {

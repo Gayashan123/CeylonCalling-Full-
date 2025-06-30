@@ -5,7 +5,28 @@ import { sessionAuth } from "../middlewares/sessionAuth.js";
 
 const router = express.Router();
 
-// GET: Get all categories for current user's shop (PRIVATE)
+// PUBLIC: Get all categories for a specific shop
+router.get("/shop/:shopId", async (req, res) => {
+  try {
+    const categories = await Category.find({ shop: req.params.shopId });
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json([]);
+  }
+});
+
+
+// PUBLIC: Get all categories in the system
+router.get("/all", async (req, res) => {
+  try {
+    const categories = await Category.find({});
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json([]);
+  }
+});
+
+// PRIVATE: Get all categories for current user's shop
 router.get("/my-shop", sessionAuth, async (req, res) => {
   try {
     const shop = await Shop.findOne({ owner: req.session.userId });
@@ -17,7 +38,7 @@ router.get("/my-shop", sessionAuth, async (req, res) => {
   }
 });
 
-// POST: Create category for current user's shop (PRIVATE)
+// PRIVATE: Create category for current user's shop
 router.post("/", sessionAuth, async (req, res) => {
   try {
     const shop = await Shop.findOne({ owner: req.session.userId });
@@ -38,29 +59,30 @@ router.post("/", sessionAuth, async (req, res) => {
   }
 });
 
-
+// PRIVATE: Update category for current user's shop
 router.put("/:id", sessionAuth, async (req, res) => {
   try {
-    // ...your update logic...
-    const food = await Food.findByIdAndUpdate(
-      req.params.id,
-      {
-        name: req.body.name,
-        price: req.body.price,
-        category: req.body.categoryId || null,
-        // handle image, etc...
-      },
-      { new: true }
-    ).populate("category"); // <--- this is crucial!
+    const shop = await Shop.findOne({ owner: req.session.userId });
+    if (!shop) return res.status(403).json({ error: "No shop for user" });
 
-    if (!food) return res.status(404).json({ error: "Food not found" });
-    res.json(food);
+    const { name } = req.body;
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: "Category name is required." });
+    }
+
+    const updated = await Category.findOneAndUpdate(
+      { _id: req.params.id, shop: shop._id },
+      { name: name.trim() },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ error: "Category not found." });
+    res.json(updated);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// DELETE: Remove a category by ID (PRIVATE)
+// PRIVATE: Remove a category by ID
 router.delete("/:id", sessionAuth, async (req, res) => {
   try {
     const shop = await Shop.findOne({ owner: req.session.userId });
@@ -73,8 +95,5 @@ router.delete("/:id", sessionAuth, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-
-
 
 export default router;
