@@ -13,6 +13,8 @@ import Shop from "./shopowner/pages/ShopOwner";
 import MyShop from "./shopowner/pages/MyShop";
 import Settings from "./shopowner/pages/Settings";
 import ShopForm from "./shopowner/pages/ShopLogUi";
+import FoodList from "./pages/FoodList"
+
 
 import SignUpPage from "./shopowner/pages/SignUpPage";
 import LoginPage from "./shopowner/pages/LoginPage";
@@ -89,6 +91,7 @@ function App() {
         <Route path="/myshop" element={<MyShop />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/shopform" element={<ShopForm />} />
+        <Route path="/foodpage/:shopId" element={<FoodList />} />
 
         {/* Dashboard */}
         <Route
