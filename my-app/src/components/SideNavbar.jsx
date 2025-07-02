@@ -48,7 +48,7 @@ function Navbar() {
     {
       icon: <FaCog />,
       label: "Settings",
-      onClick: () => setShowSettings(true),
+      onClick: () => navigate("/usersetting"),
     },
   ];
 

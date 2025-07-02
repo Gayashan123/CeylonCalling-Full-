@@ -34,6 +34,7 @@ import SiteUserLoginPage from "./pages/LoginPage";
 import SiteUserEmailVerificationPage from "./pages/UserEmailVerificationPage";
 import SiteUserForgotPasswordPage from "./pages/UserForgotPasswordPage";
 import SiteUserResetPasswordPage from "./pages/UserResetPasswordPage";
+import UserSettings from "./pages/UserSettings";
 
 // Components
 import LoadingSpinner from "./shopowner/components/LoadingSpinner";
@@ -191,6 +192,8 @@ function App() {
 
         {/* ----------- SITE USER ROUTES ----------- */}
         <Route path="/userlogui" element={<UserLogUi />} />
+              
+
 
         {/* SiteUser Auth */}
         <Route
@@ -236,6 +239,19 @@ function App() {
             </SiteUserProtectedRoute>
           }
         />
+
+        <Route
+  path="/usersetting"
+  element={
+    <SiteUserProtectedRoute>
+      <UserSettings />
+    </SiteUserProtectedRoute>
+  }
+/>
+
+       
+
+
         {/*<Route
           path="/user/profile"
           element={

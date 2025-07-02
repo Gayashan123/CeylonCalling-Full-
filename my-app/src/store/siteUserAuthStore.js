@@ -133,55 +133,63 @@ export const useSiteUserAuthStore = create((set, get) => ({
   },
 
 changePassword: async (currentPassword, newPassword) => {
-    set({ isLoading: true, error: null, message: null });
-    try {
-      const response = await axios.post(`${API_URL}/change-password`, {
-        currentPassword,
-        newPassword,
-      });
-      set({
-        isLoading: false,
-        error: null,
-        message: response.data.message,
-      });
-      return response.data;
-    } catch (error) {
-      set({
-        isLoading: false,
-        error:
-          error.response?.data?.message ||
-          error.message ||
-          "Error changing password",
-      });
-      throw error;
-    }
-  },
+  set({ isLoading: true, error: null, message: null });
+  const token = get().token;
+  try {
+    const response = await axios.post(
+      `${API_URL}/change-password`,
+      { currentPassword, newPassword },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    set({
+      isLoading: false,
+      error: null,
+      message: response.data.message,
+    });
+    return response.data;
+  } catch (error) {
+    set({
+      isLoading: false,
+      error:
+        error.response?.data?.message ||
+        error.message ||
+        "Error changing password",
+    });
+    throw error;
+  }
+},
 
-  updateProfile: async (name, email) => {
-    set({ isLoading: true, error: null, message: null });
-    try {
-      const response = await axios.post(`${API_URL}/update-profile`, {
-        name,
-        email,
-      });
-      set({
-        user: response.data.user,
-        isLoading: false,
-        error: null,
-        message: response.data.message,
-      });
-      return response.data;
-    } catch (error) {
-      set({
-        isLoading: false,
-        error:
-          error.response?.data?.message ||
-          error.message ||
-          "Error updating profile",
-      });
-      throw error;
-    }
-  },
+updateProfile: async (name, email) => {
+  set({ isLoading: true, error: null, message: null });
+  const token = get().token;
+  try {
+    const response = await axios.post(
+      `${API_URL}/update-profile`,
+      { name, email },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    set({
+      user: response.data.user,
+      isLoading: false,
+      error: null,
+      message: response.data.message,
+    });
+    return response.data;
+  } catch (error) {
+    set({
+      isLoading: false,
+      error:
+        error.response?.data?.message ||
+        error.message ||
+        "Error updating profile",
+    });
+    throw error;
+  }
+},
 }));
 
 

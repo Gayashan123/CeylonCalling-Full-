@@ -12,7 +12,7 @@ export const siteUserAuth = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    req.user = decoded; // { id, email, isVerified }
     next();
   } catch (err) {
     res.status(401).json({ message: "Token is not valid" });

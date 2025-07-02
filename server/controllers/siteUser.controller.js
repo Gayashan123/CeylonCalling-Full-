@@ -206,7 +206,7 @@ export const checkAuth = async (req, res) => {
 // CHANGE PASSWORD (Protected)
 // ============================
 export const changePassword = async (req, res) => {
-  const userId = req.session.userId;
+  const userId = req.user.id; // <- updated
   const { currentPassword, newPassword } = req.body;
 
   try {
@@ -220,7 +220,7 @@ export const changePassword = async (req, res) => {
       return res.status(400).json({ success: false, message: "New password must be at least 6 characters" });
     }
 
-    const user = await User.findById(userId);
+    const user = await SiteUser.findById(userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
@@ -246,10 +246,13 @@ export const changePassword = async (req, res) => {
   }
 };
 
+
+
+// ============================
 // UPDATE PROFILE (Protected)
 // ============================
 export const updateProfile = async (req, res) => {
-  const userId = req.session.userId;
+  const userId = req.user.id; // <- updated
   const { name, email } = req.body;
 
   try {
@@ -261,12 +264,12 @@ export const updateProfile = async (req, res) => {
     }
 
     // Check if email is already used by another user
-    const existingUser = await User.findOne({ email, _id: { $ne: userId } });
+    const existingUser = await SiteUser.findOne({ email, _id: { $ne: userId } });
     if (existingUser) {
       return res.status(400).json({ success: false, message: "Email is already taken" });
     }
 
-    const user = await User.findById(userId);
+    const user = await SiteUser.findById(userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
