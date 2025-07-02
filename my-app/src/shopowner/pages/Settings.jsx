@@ -46,7 +46,7 @@ function Settings() {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const fetchShop = async () => {

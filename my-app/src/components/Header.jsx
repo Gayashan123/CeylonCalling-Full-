@@ -14,7 +14,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   const handleDiscoverClick = () => {
-    navigate("/home");
+    navigate("/user/login");
   };
 
   return (

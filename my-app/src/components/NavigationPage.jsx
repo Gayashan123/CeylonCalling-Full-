@@ -1,33 +1,17 @@
 import React, { useState } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { FiSearch, FiMapPin } from 'react-icons/fi';
-import Login from './Login';
-import Create from './Create';
-import Logo from '../assets/Lion.jpg';
 import { useNavigate } from 'react-router-dom';
+import { useSiteUserAuthStore } from '../store/siteUserAuthStore'; // Adjust the path as needed
 
 function Navigation() {
-  const [showLogin, setShowLogin] = useState(false);
-  const [showSignup, setShowSignup] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const logout = useSiteUserAuthStore(state => state.logout);
   const navigate = useNavigate();
 
-  const openLogin = () => {
-    setShowLogin(true);
-    setShowSignup(false);
-    setMenuOpen(false);
-  };
-
-  const openSignup = () => {
-    setShowSignup(true);
-    setShowLogin(false);
-    setMenuOpen(false);
-  };
-
-  const closeModals = () => {
-    setShowLogin(false);
-    setShowSignup(false);
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
   };
 
   const handleGetLocation = () => {
@@ -37,22 +21,18 @@ function Navigation() {
         alert(`Location detected:\nLatitude: ${latitude}\nLongitude: ${longitude}`);
       },
       () => {
-        alert("Failed to get location. Please enable location services.");
+        alert('Failed to get location. Please enable location services.');
       }
     );
   };
 
-  // Navigate to home or Header component on logo click
+  // Navigate to home on logo click
   const goToHeader = () => {
-    navigate('/'); // or any route you want, e.g. '/header'
+    navigate('/');
   };
 
   return (
-    <div
-      className={`fixed top-0 left-0 z-50 w-full backdrop-blur-lg ${
-        showLogin || showSignup ? 'bg-black/60' : 'bg-white shadow-lg'
-      }`}
-    >
+    <div className="fixed top-0 left-0 z-50 w-full bg-white shadow-lg backdrop-blur-lg">
       <div className="max-w-screen-xl mx-auto px-4 py-4 flex justify-between items-center">
         {/* Logo & Title */}
         <div
@@ -60,11 +40,6 @@ function Navigation() {
           className="flex items-center gap-3 cursor-pointer select-none"
           title="Go to Home"
         >
-          <img
-            src={Logo}
-            alt="Logo"
-            className="h-12 w-12 rounded-full object-cover shadow-teal-200 shadow-md"
-          />
           <span className="text-2xl font-extrabold tracking-tight text-gray-900">
             Ceylon Calling
           </span>
@@ -92,16 +67,10 @@ function Navigation() {
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center gap-4">
           <button
-            onClick={openLogin}
-            className="px-5 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200 transition"
-          >
-            Log in
-          </button>
-          <button
-            onClick={openSignup}
+            onClick={handleLogout}
             className="px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-full hover:from-purple-600 hover:to-pink-600 transition"
           >
-            Sign up
+            Log out
           </button>
         </div>
 
@@ -139,23 +108,13 @@ function Navigation() {
       {menuOpen && (
         <div className="px-4 py-3 md:hidden bg-white border-t border-gray-100 shadow-md">
           <button
-            onClick={openLogin}
-            className="w-full mb-2 px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200"
-          >
-            Log in
-          </button>
-          <button
-            onClick={openSignup}
+            onClick={handleLogout}
             className="w-full px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-full hover:from-purple-600 hover:to-pink-600"
           >
-            Sign up
+            Log out
           </button>
         </div>
       )}
-
-      {/* Modals */}
-      {showLogin && <Login closeLogin={closeModals} signup={openSignup} />}
-      {showSignup && <Create closeLogin={closeModals} login={openLogin} />}
     </div>
   );
 }
