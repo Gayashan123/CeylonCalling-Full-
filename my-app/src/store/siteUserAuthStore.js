@@ -131,4 +131,63 @@ export const useSiteUserAuthStore = create((set, get) => ({
       localStorage.removeItem("siteuser_token");
     }
   },
+
+changePassword: async (currentPassword, newPassword) => {
+    set({ isLoading: true, error: null, message: null });
+    try {
+      const response = await axios.post(`${API_URL}/change-password`, {
+        currentPassword,
+        newPassword,
+      });
+      set({
+        isLoading: false,
+        error: null,
+        message: response.data.message,
+      });
+      return response.data;
+    } catch (error) {
+      set({
+        isLoading: false,
+        error:
+          error.response?.data?.message ||
+          error.message ||
+          "Error changing password",
+      });
+      throw error;
+    }
+  },
+
+  updateProfile: async (name, email) => {
+    set({ isLoading: true, error: null, message: null });
+    try {
+      const response = await axios.post(`${API_URL}/update-profile`, {
+        name,
+        email,
+      });
+      set({
+        user: response.data.user,
+        isLoading: false,
+        error: null,
+        message: response.data.message,
+      });
+      return response.data;
+    } catch (error) {
+      set({
+        isLoading: false,
+        error:
+          error.response?.data?.message ||
+          error.message ||
+          "Error updating profile",
+      });
+      throw error;
+    }
+  },
 }));
+
+
+
+
+
+
+
+

@@ -200,3 +200,91 @@ export const checkAuth = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+
+// ============================
+// CHANGE PASSWORD (Protected)
+// ============================
+export const changePassword = async (req, res) => {
+  const userId = req.session.userId;
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Not authenticated" });
+    }
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, message: "New password must be at least 6 characters" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const isMatch = await bcryptjs.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: "Current password is incorrect" });
+    }
+
+    // Prevent setting the same password again
+    const isSame = await bcryptjs.compare(newPassword, user.password);
+    if (isSame) {
+      return res.status(400).json({ success: false, message: "New password must be different from the current password" });
+    }
+
+    user.password = await bcryptjs.hash(newPassword, 10);
+    await user.save();
+
+    res.status(200).json({ success: true, message: "Password changed successfully" });
+  } catch (error) {
+    console.log("Error in changePassword:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// UPDATE PROFILE (Protected)
+// ============================
+export const updateProfile = async (req, res) => {
+  const userId = req.session.userId;
+  const { name, email } = req.body;
+
+  try {
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Not authenticated" });
+    }
+    if (!name || !email) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+
+    // Check if email is already used by another user
+    const existingUser = await User.findOne({ email, _id: { $ne: userId } });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: "Email is already taken" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    user.name = name;
+    user.email = email;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: {
+        ...user._doc,
+        password: undefined,
+      },
+    });
+  } catch (error) {
+    console.log("Error in updateProfile:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
