@@ -1,11 +1,14 @@
 import { create } from "zustand";
 import axios from "axios";
 
-// You may need to adjust API_URL for your environment
 const API_URL =
   import.meta.env.MODE === "development"
     ? "http://localhost:5000/api/siteuser"
     : "/api/siteuser";
+const FAV_URL =
+  import.meta.env.MODE === "development"
+    ? "http://localhost:5000/api/user/favourites"
+    : "/api/user/favourites";
 
 export const useSiteUserAuthStore = create((set, get) => ({
   user: null,
@@ -13,16 +16,19 @@ export const useSiteUserAuthStore = create((set, get) => ({
   isAuthenticated: !!localStorage.getItem("siteuser_token"),
   isLoading: false,
   error: null,
+  message: null,
+  favourites: [],
+
+  // --- Auth Actions ---
 
   signup: async (email, password, name) => {
     set({ isLoading: true, error: null });
     try {
       await axios.post(`${API_URL}/signup`, { email, password, name });
-      set({ isLoading: false }); // Wait for verification
+      set({ isLoading: false });
     } catch (error) {
       set({
-        error:
-          error.response?.data?.message || error.message || "Error signing up",
+        error: error.response?.data?.message || error.message || "Error signing up",
         isLoading: false,
       });
       throw error;
@@ -74,7 +80,7 @@ export const useSiteUserAuthStore = create((set, get) => ({
   },
 
   logout: () => {
-    set({ user: null, token: null, isAuthenticated: false });
+    set({ user: null, token: null, isAuthenticated: false, favourites: [] });
     localStorage.removeItem("siteuser_token");
   },
 
@@ -132,70 +138,122 @@ export const useSiteUserAuthStore = create((set, get) => ({
     }
   },
 
-changePassword: async (currentPassword, newPassword) => {
-  set({ isLoading: true, error: null, message: null });
-  const token = get().token;
-  try {
-    const response = await axios.post(
-      `${API_URL}/change-password`,
-      { currentPassword, newPassword },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    set({
-      isLoading: false,
-      error: null,
-      message: response.data.message,
-    });
-    return response.data;
-  } catch (error) {
-    set({
-      isLoading: false,
-      error:
-        error.response?.data?.message ||
-        error.message ||
-        "Error changing password",
-    });
-    throw error;
-  }
-},
+  changePassword: async (currentPassword, newPassword) => {
+    set({ isLoading: true, error: null, message: null });
+    const token = get().token;
+    try {
+      const response = await axios.post(
+        `${API_URL}/change-password`,
+        { currentPassword, newPassword },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      set({
+        isLoading: false,
+        error: null,
+        message: response.data.message,
+      });
+      return response.data;
+    } catch (error) {
+      set({
+        isLoading: false,
+        error:
+          error.response?.data?.message ||
+          error.message ||
+          "Error changing password",
+      });
+      throw error;
+    }
+  },
 
-updateProfile: async (name, email) => {
-  set({ isLoading: true, error: null, message: null });
-  const token = get().token;
-  try {
-    const response = await axios.post(
-      `${API_URL}/update-profile`,
-      { name, email },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    set({
-      user: response.data.user,
-      isLoading: false,
-      error: null,
-      message: response.data.message,
-    });
-    return response.data;
-  } catch (error) {
-    set({
-      isLoading: false,
-      error:
-        error.response?.data?.message ||
-        error.message ||
-        "Error updating profile",
-    });
-    throw error;
-  }
-},
+  updateProfile: async (name, email) => {
+    set({ isLoading: true, error: null, message: null });
+    const token = get().token;
+    try {
+      const response = await axios.post(
+        `${API_URL}/update-profile`,
+        { name, email },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      set({
+        user: response.data.user,
+        isLoading: false,
+        error: null,
+        message: response.data.message,
+      });
+      return response.data;
+    } catch (error) {
+      set({
+        isLoading: false,
+        error:
+          error.response?.data?.message ||
+          error.message ||
+          "Error updating profile",
+      });
+      throw error;
+    }
+  },
+
+  // --- Favourites ---
+
+  fetchFavourites: async () => {
+    set({ isLoading: true });
+    try {
+      const token = get().token;
+      const res = await axios.get(FAV_URL, {
+        withCredentials: true,
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      // Accept both [{_id: ...}] or [id, ...]
+      set({
+        favourites: Array.isArray(res.data)
+          ? res.data.map(shop => shop._id || shop)
+          : [],
+        isLoading: false,
+      });
+    } catch (error) {
+      set({ error: "Error fetching favourites", isLoading: false });
+    }
+  },
+
+  addFavourite: async (shopId) => {
+    set({ isLoading: true });
+    try {
+      const token = get().token;
+      await axios.post(
+        FAV_URL,
+        { shopId },
+        {
+          withCredentials: true,
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }
+      );
+      set((state) => ({
+        favourites: [...state.favourites, shopId],
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({ error: "Error adding favourite", isLoading: false });
+    }
+  },
+
+  removeFavourite: async (shopId) => {
+    set({ isLoading: true });
+    try {
+      const token = get().token;
+      await axios.delete(`${FAV_URL}/${shopId}`, {
+        withCredentials: true,
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      set((state) => ({
+        favourites: state.favourites.filter((id) => id !== shopId),
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({ error: "Error removing favourite", isLoading: false });
+    }
+  },
 }));
-
-
-
-
-
-
-
-

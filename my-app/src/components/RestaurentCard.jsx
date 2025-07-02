@@ -8,7 +8,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
-function RestaurantCard({ shop, categories }) {
+function RestaurantCard({ shop, categories, onViewMenu, isFavourite, onFavourite }) {
   const navigate = useNavigate();
 
   return (
@@ -62,9 +62,14 @@ function RestaurantCard({ shop, categories }) {
         </div>
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-3 mt-6">
-          <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-red-50 hover:text-red-500 hover:border-red-300 transition-all">
-            <FaHeart className="text-red-400" />
-            Favourite
+          <button
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border rounded-full shadow-sm transition-all
+              ${isFavourite ? "bg-red-100 text-red-500 border-red-300" : "bg-white text-gray-700 border-gray-200 hover:bg-red-50 hover:text-red-500 hover:border-red-300"}
+            `}
+            onClick={onFavourite}
+          >
+            <FaHeart className={isFavourite ? "text-red-500" : "text-red-400"} />
+            {isFavourite ? "Favourited" : "Favourite"}
           </button>
           <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all">
             <FaMapMarkerAlt className="text-green-500" />
