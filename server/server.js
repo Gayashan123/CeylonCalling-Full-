@@ -12,6 +12,7 @@ import shopRoutes from "./routes/shopRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import foodRoutes from "./routes/foodRoutes.js";
 import authRoutes from "./routes/auth.route.js";
+import siteUserRoutes from "./routes/siteUser.routes.js"; // <--- ADD THIS LINE
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -74,6 +75,7 @@ app.use("/api/shops", shopRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/food", foodRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/siteuser", siteUserRoutes); // <--- ADD THIS LINE
 
 // Production build serving (not used in dev)
 if (process.env.NODE_ENV === "production") {
