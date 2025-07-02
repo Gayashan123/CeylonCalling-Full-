@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Navigation from "./Navigation";
 import ximage from "../assets/Hero.jpg";
 import { FaCompass, FaPhoneAlt } from "react-icons/fa";
@@ -7,10 +7,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export default function Header() {
-  const [appoin, setAppoin] = useState(false);
-  const openAppoin = () => setAppoin(true);
-  const closeAppoinmen = () => setAppoin(false);
-
   const navigate = useNavigate();
 
   const handleDiscoverClick = () => {
