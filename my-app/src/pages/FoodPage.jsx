@@ -4,6 +4,7 @@ import { FiSearch, FiArrowLeftCircle } from "react-icons/fi";
 import { FaTag } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import SearchBar from "../components/SearchBar";
+import Navbar from "../components/SideNavbar";
 
 
 
@@ -179,24 +180,7 @@ export default function FoodList({ shopId }) {
           transition={{ type: "spring", stiffness: 230, damping: 24, delay: 0.07 }}
           className="flex"
         >
-          <button
-            onClick={() => navigate("/home")}
-            className="group flex items-center gap-2 px-5 py-2 mb-8 bg-gradient-to-r from-blue-500 via-cyan-400 to-pink-400 text-white rounded-full shadow-xl hover:scale-105 hover:shadow-2xl transition-all font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400"
-            style={{
-              fontSize: "1.15rem",
-              letterSpacing: "0.02em"
-            }}
-            aria-label="Back to home"
-          >
-            {/* Glowing animated circle */}
-            <span className="relative flex items-center justify-center">
-              <span className="absolute inline-flex h-8 w-8 rounded-full bg-gradient-to-br from-blue-400 via-cyan-300 to-pink-400 opacity-70 blur-md group-hover:scale-125 transition-transform"></span>
-              <FiArrowLeftCircle size={28} className="relative drop-shadow-lg group-hover:text-pink-100 transition-colors animate-pulse" />
-            </span>
-            <span className="tracking-wide drop-shadow-sm group-hover:text-pink-100 transition-colors">
-              Back to Home
-            </span>
-          </button>
+          
         </motion.div>
 
         <motion.h1
@@ -302,7 +286,7 @@ export default function FoodList({ shopId }) {
 
 
 
-
+<Navbar />
 
 
 

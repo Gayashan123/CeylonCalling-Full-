@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useLocation, Link } from "react-router-dom";
+import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
 import { FaArrowLeft, FaSearch } from "react-icons/fa";
 import { MdOutlineFastfood } from "react-icons/md";
 import { BiCategoryAlt } from "react-icons/bi";
@@ -7,6 +7,7 @@ import { BiCategoryAlt } from "react-icons/bi";
 function Menu() {
   const { shopId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const shopName = location.state?.shopName || "Shop";
 
   const [categories, setCategories] = useState([]);
@@ -90,9 +91,12 @@ function Menu() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-white p-4 sm:p-6 md:p-10 font-sans text-gray-800 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4 sm:gap-0">
-        <Link to="/home" className="flex items-center text-blue-600 hover:underline text-sm sm:text-base">
+        <button
+          onClick={() => navigate("/user/dashboard")}
+          className="flex items-center text-blue-600 hover:underline text-sm sm:text-base"
+        >
           <FaArrowLeft className="mr-2" /> Back to Home
-        </Link>
+        </button>
 
         <div className="relative w-full sm:w-auto">
           <input
