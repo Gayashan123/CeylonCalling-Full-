@@ -76,7 +76,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/food", foodRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/siteuser", siteUserRoutes); // <--- ADD THIS LINE
-app.use("/api/user/favourites", favouriteRoutes);
+app.use("/api/user", favouriteRoutes);
 
 // Production build serving (not used in dev)
 if (process.env.NODE_ENV === "production") {
