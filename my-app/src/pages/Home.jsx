@@ -1,14 +1,14 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Navigation from "../components/NavigationPage";
 import SideNavbar from "../components/SideNavbar";
 import RestaurantCard from "../components/RestaurentCard";
+import { FaFilter } from "react-icons/fa";
 import SearchBar from "../components/SearchBar";
 import PriceFilter from "../components/FilterSection";
 import ShopTypeFilter from "../components/ShopTypeFilter";
+
+// Import Framer Motion
 import { motion, AnimatePresence } from "framer-motion";
-import { useSiteUserAuthStore } from "../store/siteUserAuthStore";
-import FavouritesModal from "../components/Favourites";
-import { Toaster } from "react-hot-toast";
 
 function Home() {
   const [allCategories, setAllCategories] = useState([]);
@@ -21,42 +21,23 @@ function Home() {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [search, setSearch] = useState("");
   const [priceFilter, setPriceFilter] = useState({ min: 0, max: 5000 });
+
+  // ✅ Add filter state
   const [shopTypeFilter, setShopTypeFilter] = useState("all");
-  const [showFavourites, setShowFavourites] = useState(false);
 
-  const {
-    favourites,
-    favouriteIds,
-    addFavourite,
-    removeFavourite,
-    fetchFavourites,
-    isAuthenticated,
-    loading,
-  } = useSiteUserAuthStore();
-
-  // Fetch favourites when authenticated
-  useEffect(() => {
-    if (isAuthenticated) fetchFavourites();
-  }, [isAuthenticated, fetchFavourites]);
-
-  // Fetch all categories
   useEffect(() => {
     setLoadingCategories(true);
     fetch("http://localhost:5000/api/categories/all")
       .then((res) => res.json())
       .then((data) => {
         setAllCategories(Array.isArray(data) ? data : []);
+        setLoadingCategories(false);
       })
-      .catch(() => {
-        setAllCategories([]);
-      })
-      .finally(() => setLoadingCategories(false));
+      .catch(() => setLoadingCategories(false));
   }, []);
 
-  // Fetch shops and their categories
   useEffect(() => {
     let isMounted = true;
-
     async function fetchShopsAndCategories() {
       setLoadingShops(true);
       try {
@@ -64,10 +45,8 @@ function Home() {
         if (!res.ok) throw new Error("Failed to fetch shops");
         const data = await res.json();
         const shopList = Array.isArray(data) ? data : data.shops || [];
-        if (!isMounted) return;
-        setShops(shopList);
+        if (isMounted) setShops(shopList);
 
-        // Fetch categories for each shop in parallel
         const categoriesEntries = await Promise.all(
           shopList.map(async (shop) => {
             try {
@@ -82,26 +61,21 @@ function Home() {
             }
           })
         );
-        if (!isMounted) return;
-        setShopCategories(Object.fromEntries(categoriesEntries));
+        const categoriesMap = Object.fromEntries(categoriesEntries);
+        if (isMounted) setShopCategories(categoriesMap);
       } catch {
-        if (!isMounted) return;
-        setShops([]);
-        setShopCategories({});
+        if (isMounted) setShops([]);
       } finally {
-        if (!isMounted) return;
-        setLoadingShops(false);
+        if (isMounted) setLoadingShops(false);
       }
     }
 
     fetchShopsAndCategories();
-
     return () => {
       isMounted = false;
     };
   }, []);
 
-  // Load foods for selected shop
   const handleViewFoods = (shopObj) => {
     setSelectedShop(shopObj);
     setLoadingFoods(true);
@@ -109,48 +83,10 @@ function Home() {
       .then((res) => res.json())
       .then((data) => {
         setFoods(Array.isArray(data) ? data : data.foods || []);
+        setLoadingFoods(false);
       })
-      .catch(() => {
-        setFoods([]);
-      })
-      .finally(() => setLoadingFoods(false));
+      .catch(() => setLoadingFoods(false));
   };
-
-  // Efficient favourite check
-  const isShopFavourited = useCallback(
-    (shopId) => favouriteIds.has(shopId),
-    [favouriteIds]
-  );
-
-  // Toggle favourite status
-  const [favouriteLoadingId, setFavouriteLoadingId] = useState(null);
-  const handleToggleFavourite = async (shopId) => {
-    if (!isAuthenticated) {
-      window.alert("You must be logged in to favourite a shop!");
-      return;
-    }
-    setFavouriteLoadingId(shopId);
-    if (isShopFavourited(shopId)) {
-      await removeFavourite(shopId);
-    } else {
-      await addFavourite(shopId);
-    }
-    setFavouriteLoadingId(null);
-  };
-
-  // Shop filtering
-  const filteredShops =
-    shopTypeFilter === "all"
-      ? shops
-      : shops.filter((shop) => shop.shopType === shopTypeFilter);
-
-  const searchedShops = filteredShops.filter((shop) => {
-    const matchesSearch = shop.name
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    // Extend with price filter logic if your shops have price data
-    return matchesSearch;
-  });
 
   const gradientColors = [
     "from-pink-400 to-pink-600",
@@ -165,24 +101,25 @@ function Home() {
     "from-sky-400 to-blue-500",
   ];
 
+  // ✅ Filtered shops based on selection
+  const filteredShops =
+    shopTypeFilter === "all"
+      ? shops
+      : shops.filter((shop) => shop.type === shopTypeFilter);
+
   return (
     <div className="relative flex flex-col min-h-screen bg-white font-sans">
-      <Toaster />
       <Navigation />
       <main className="flex-grow pb-24 px-4 sm:px-8">
         {/* Categories */}
-        <section className="mt-10">
+        <section className="mt-35">
           <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-end mb-4">
-            <h2 className="text-3xl font-bold text-gray-800">Explore Categories</h2>
+            <h2 className="text-3xl font-bold text-gray-800">
+              Explore Categories
+            </h2>
             <p className="text-sm text-gray-500 mt-1 sm:mt-0">
               Find your favorite food by category!
             </p>
-            <button
-              className="ml-auto mt-3 sm:mt-0 bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-1 rounded-full font-semibold shadow hover:bg-yellow-200 transition"
-              onClick={() => setShowFavourites(true)}
-            >
-              View Favourites ({favourites.length})
-            </button>
           </div>
           {loadingCategories ? (
             <div className="flex justify-center py-10">
@@ -198,8 +135,8 @@ function Home() {
                 visible: {
                   transition: {
                     staggerChildren: 0.05,
-                  },
-                },
+                  }
+                }
               }}
             >
               {allCategories.map((cat, i) => (
@@ -218,24 +155,29 @@ function Home() {
             </motion.div>
           )}
         </section>
-
         <hr className="my-10 border-0 h-1 bg-gradient-to-r from-fuchsia-500 via-indigo-400 to-cyan-400 rounded-full shadow-xl opacity-70" />
-
         <ShopTypeFilter value={shopTypeFilter} onChange={setShopTypeFilter} />
 
-        <PriceFilter min={0} max={5000} value={priceFilter} onChange={setPriceFilter} />
-
+        <PriceFilter
+          min={0}
+          max={5000}
+          value={priceFilter}
+          onChange={setPriceFilter}
+        />
         <hr className="my-8 border-0 h-1 bg-gradient-to-r from-pink-400 via-blue-400 to-green-400 rounded shadow-lg" />
-
-        <SearchBar value={search} onChange={setSearch} onSubmit={() => {}} />
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          onSubmit={() => {
+            /* handle search/filter logic here */
+          }}
+        />
 
         {/* Shops */}
         <section>
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Shops</h2>
           {loadingShops ? (
             <p>Loading shops...</p>
-          ) : searchedShops.length === 0 ? (
-            <p>No shops found.</p>
           ) : (
             <motion.div
               className="flex flex-col gap-6"
@@ -243,10 +185,10 @@ function Home() {
               animate="visible"
               variants={{
                 hidden: {},
-                visible: { transition: { staggerChildren: 0.07 } },
+                visible: { transition: { staggerChildren: 0.07 } }
               }}
             >
-              {searchedShops.map((shop, idx) => (
+              {filteredShops.map((shop, idx) => (
                 <motion.div
                   key={shop._id}
                   initial={{ opacity: 0, scale: 0.97, y: 24 }}
@@ -257,9 +199,6 @@ function Home() {
                     shop={shop}
                     categories={shopCategories[shop._id] || []}
                     onViewMenu={handleViewFoods}
-                    isFavourite={isShopFavourited(shop._id)}
-                    onFavourite={handleToggleFavourite}
-                    favouriteLoading={favouriteLoadingId === shop._id && loading.favourites}
                   />
                 </motion.div>
               ))}
@@ -298,8 +237,6 @@ function Home() {
               </h3>
               {loadingFoods ? (
                 <p>Loading foods...</p>
-              ) : foods.length === 0 ? (
-                <p>No foods available.</p>
               ) : (
                 <motion.div
                   className="grid grid-cols-1 sm:grid-cols-2 gap-4"
@@ -307,7 +244,7 @@ function Home() {
                   animate="visible"
                   variants={{
                     hidden: {},
-                    visible: { transition: { staggerChildren: 0.06 } },
+                    visible: { transition: { staggerChildren: 0.06 } }
                   }}
                 >
                   {foods.map((food, idx) => (
@@ -341,15 +278,6 @@ function Home() {
       </AnimatePresence>
 
       <SideNavbar />
-
-      {/* Favourites Modal */}
-      <FavouritesModal
-        isOpen={showFavourites}
-        favourites={favourites}
-        onClose={() => setShowFavourites(false)}
-        onRemove={removeFavourite}
-        loading={loading.favourites}
-      />
     </div>
   );
 }

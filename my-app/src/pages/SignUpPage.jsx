@@ -113,7 +113,7 @@ const SignUpPage = () => {
         <p className="mt-8 text-center text-gray-600 select-none z-10 relative">
           Already have an account?{" "}
           <Link
-            to="/login"
+            to="/user/login"
             className="font-semibold text-blue-600 hover:text-blue-800 transition-colors duration-200"
           >
             Login

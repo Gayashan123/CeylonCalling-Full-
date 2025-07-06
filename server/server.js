@@ -13,7 +13,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import foodRoutes from "./routes/foodRoutes.js";
 import authRoutes from "./routes/auth.route.js";
 import siteUserRoutes from "./routes/siteUser.routes.js"; // <--- ADD THIS LINE
-import favouriteRoutes from "./routes/favourite.routes.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -76,7 +76,6 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/food", foodRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/siteuser", siteUserRoutes); // <--- ADD THIS LINE
-app.use("/api/user", favouriteRoutes);
 
 // Production build serving (not used in dev)
 if (process.env.NODE_ENV === "production") {

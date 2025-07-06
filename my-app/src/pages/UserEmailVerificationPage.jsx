@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import {useSiteUserAuthStore } from "../store/siteUserAuthStore";
+import { useSiteUserAuthStore } from "../store/siteUserAuthStore";
 import toast from "react-hot-toast";
 
 const EmailVerificationPage = () => {
@@ -9,7 +9,7 @@ const EmailVerificationPage = () => {
   const inputRefs = useRef([]);
   const navigate = useNavigate();
 
-  const { error, isLoading, verifyEmail } =useSiteUserAuthStore();
+  const { error, isLoading, verifyEmail } = useSiteUserAuthStore();
 
   const handleChange = (index, value) => {
     const newCode = [...code];
@@ -44,7 +44,7 @@ const EmailVerificationPage = () => {
     try {
       await verifyEmail(verificationCode);
       toast.success("Email verified successfully!");
-      navigate("/user/login"); // <-- Redirect to shop creation page
+      navigate("/user/login"); // <-- Redirect to login page
     } catch (error) {
       console.log(error);
     }

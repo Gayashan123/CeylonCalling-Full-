@@ -1,289 +1,169 @@
 import { create } from "zustand";
 import axios from "axios";
-import toast from "react-hot-toast";
 
+// Adjust API URL as needed
 const API_URL =
   import.meta.env.MODE === "development"
     ? "http://localhost:5000/api/siteuser"
     : "/api/siteuser";
-const FAV_URL =
-  import.meta.env.MODE === "development"
-    ? "http://localhost:5000/api/user/favourites"
-    : "/api/user/favourites";
+
+axios.defaults.withCredentials = true; // Important: send cookies with requests
 
 export const useSiteUserAuthStore = create((set, get) => ({
   user: null,
-  token: localStorage.getItem("siteuser_token") || null,
-  isAuthenticated: !!localStorage.getItem("siteuser_token"),
-  loading: {
-    auth: false,
-    favourites: false,
-  },
+  isAuthenticated: false,
+  isLoading: false,
   error: null,
   message: null,
-  favourites: [],
-  favouriteIds: new Set(),
-
-  // --- Auth Actions ---
 
   signup: async (email, password, name) => {
-    set((state) => ({ loading: { ...state.loading, auth: true }, error: null }));
+    set({ isLoading: true, error: null, message: null });
     try {
       await axios.post(`${API_URL}/signup`, { email, password, name });
-      set((state) => ({ loading: { ...state.loading, auth: false } }));
-      toast.success("Sign up successful! Please check your email to verify.");
+      // Signup usually requires email verification before login
+      set({ isLoading: false, message: "Signup successful. Please verify your email." });
     } catch (error) {
-      set((state) => ({
+      set({
         error: error.response?.data?.message || error.message || "Error signing up",
-        loading: { ...state.loading, auth: false },
-      }));
-      toast.error(error.response?.data?.message || "Sign up failed.");
+        isLoading: false,
+      });
       throw error;
     }
   },
 
-  verifyEmail: async (email, code) => {
-    set((state) => ({ loading: { ...state.loading, auth: true }, error: null }));
+  verifyEmail: async (code) => {
+    set({ isLoading: true, error: null, message: null });
     try {
-      const res = await axios.post(`${API_URL}/verify-email`, { email, code });
-      set((state) => ({
+      const res = await axios.post(`${API_URL}/verify-email`, { code });
+      set({
         user: res.data.user,
-        token: res.data.token,
         isAuthenticated: true,
-        loading: { ...state.loading, auth: false },
+        isLoading: false,
         error: null,
-      }));
-      localStorage.setItem("siteuser_token", res.data.token);
-      toast.success("Email verified!");
-      return res.data;
+        message: "Email verified successfully",
+      });
     } catch (error) {
-      set((state) => ({
+      set({
         error: error.response?.data?.message || "Verification failed",
-        loading: { ...state.loading, auth: false },
-      }));
-      toast.error(error.response?.data?.message || "Verification failed");
+        isLoading: false,
+      });
       throw error;
     }
   },
 
   login: async (email, password) => {
-    set((state) => ({ loading: { ...state.loading, auth: true }, error: null }));
+    set({ isLoading: true, error: null, message: null });
     try {
       const res = await axios.post(`${API_URL}/login`, { email, password });
-      set((state) => ({
+      set({
         user: res.data.user,
-        token: res.data.token,
         isAuthenticated: true,
-        loading: { ...state.loading, auth: false },
+        isLoading: false,
         error: null,
-      }));
-      localStorage.setItem("siteuser_token", res.data.token);
-      toast.success("Login successful!");
-      return res.data;
+      });
     } catch (error) {
-      set((state) => ({
+      set({
         error: error.response?.data?.message || "Login failed",
-        loading: { ...state.loading, auth: false },
-      }));
-      toast.error(error.response?.data?.message || "Login failed");
+        isLoading: false,
+      });
       throw error;
     }
   },
 
-  logout: () => {
-    set({
-      user: null,
-      token: null,
-      isAuthenticated: false,
-      favourites: [],
-      favouriteIds: new Set(),
-    });
-    localStorage.removeItem("siteuser_token");
-    toast.success("Logged out successfully.");
+  logout: async () => {
+    set({ isLoading: true, error: null, message: null });
+    try {
+      await axios.post(`${API_URL}/logout`);
+      set({ user: null, isAuthenticated: false, isLoading: false, error: null });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Logout failed",
+        isLoading: false,
+      });
+      throw error;
+    }
   },
 
   forgotPassword: async (email) => {
-    set((state) => ({ loading: { ...state.loading, auth: true }, error: null }));
+    set({ isLoading: true, error: null, message: null });
     try {
       await axios.post(`${API_URL}/forgot-password`, { email });
-      set((state) => ({ loading: { ...state.loading, auth: false } }));
-      toast.success("Password reset email sent!");
+      set({ isLoading: false, message: "Password reset link sent to your email" });
     } catch (error) {
-      set((state) => ({
+      set({
         error: error.response?.data?.message || "Error sending reset email",
-        loading: { ...state.loading, auth: false },
-      }));
-      toast.error(error.response?.data?.message || "Error sending reset email");
+        isLoading: false,
+      });
       throw error;
     }
   },
 
   resetPassword: async (token, password) => {
-    set((state) => ({ loading: { ...state.loading, auth: true }, error: null }));
+    set({ isLoading: true, error: null, message: null });
     try {
       await axios.post(`${API_URL}/reset-password/${token}`, { password });
-      set((state) => ({ loading: { ...state.loading, auth: false } }));
-      toast.success("Password reset successful!");
+      set({ isLoading: false, message: "Password reset successful" });
     } catch (error) {
-      set((state) => ({
+      set({
         error: error.response?.data?.message || "Error resetting password",
-        loading: { ...state.loading, auth: false },
-      }));
-      toast.error(error.response?.data?.message || "Error resetting password");
+        isLoading: false,
+      });
       throw error;
     }
   },
 
   checkAuth: async () => {
-    set((state) => ({ loading: { ...state.loading, auth: true }, error: null }));
-    const token = get().token;
-    if (!token) {
-      set({ isAuthenticated: false, user: null, loading: { ...get().loading, auth: false } });
-      return;
-    }
+    set({ isLoading: true, error: null });
     try {
-      const res = await axios.get(`${API_URL}/check-auth`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      set((state) => ({
+      const res = await axios.get(`${API_URL}/check-auth`);
+      set({
         user: res.data.user,
         isAuthenticated: true,
-        loading: { ...state.loading, auth: false },
-      }));
+        isLoading: false,
+        error: null,
+      });
     } catch (error) {
-      set((state) => ({
-        isAuthenticated: false,
+      set({
         user: null,
-        loading: { ...state.loading, auth: false },
-      }));
-      localStorage.removeItem("siteuser_token");
+        isAuthenticated: false,
+        isLoading: false,
+        error: null,
+      });
     }
   },
 
   changePassword: async (currentPassword, newPassword) => {
-    set((state) => ({ loading: { ...state.loading, auth: true }, error: null, message: null }));
-    const token = get().token;
+    set({ isLoading: true, error: null, message: null });
     try {
-      const response = await axios.post(
-        `${API_URL}/change-password`,
-        { currentPassword, newPassword },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      set((state) => ({
-        loading: { ...state.loading, auth: false },
-        error: null,
-        message: response.data.message,
-      }));
-      toast.success("Password changed!");
-      return response.data;
+      const res = await axios.post(`${API_URL}/change-password`, { currentPassword, newPassword });
+      set({ isLoading: false, message: res.data.message, error: null });
+      return res.data;
     } catch (error) {
-      set((state) => ({
-        loading: { ...state.loading, auth: false },
-        error: error.response?.data?.message || error.message || "Error changing password",
-      }));
-      toast.error(error.response?.data?.message || "Error changing password");
+      set({
+        isLoading: false,
+        error: error.response?.data?.message || "Error changing password",
+      });
       throw error;
     }
   },
 
   updateProfile: async (name, email) => {
-    set((state) => ({ loading: { ...state.loading, auth: true }, error: null, message: null }));
-    const token = get().token;
+    set({ isLoading: true, error: null, message: null });
     try {
-      const response = await axios.post(
-        `${API_URL}/update-profile`,
-        { name, email },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      set((state) => ({
-        user: response.data.user,
-        loading: { ...state.loading, auth: false },
+      const res = await axios.post(`${API_URL}/update-profile`, { name, email });
+      set({
+        user: res.data.user,
+        isLoading: false,
+        message: res.data.message,
         error: null,
-        message: response.data.message,
-      }));
-      toast.success("Profile updated!");
-      return response.data;
+      });
+      return res.data;
     } catch (error) {
-      set((state) => ({
-        loading: { ...state.loading, auth: false },
-        error: error.response?.data?.message || error.message || "Error updating profile",
-      }));
-      toast.error(error.response?.data?.message || "Error updating profile");
+      set({
+        isLoading: false,
+        error: error.response?.data?.message || "Error updating profile",
+      });
       throw error;
-    }
-  },
-
-  // --- Favourites ---
-
-  fetchFavourites: async () => {
-    set((state) => ({
-      loading: { ...state.loading, favourites: true },
-    }));
-    try {
-      const token = get().token;
-      const res = await fetch(FAV_URL, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-      set({
-        favourites: Array.isArray(data) ? data : [],
-        favouriteIds: new Set(Array.isArray(data) ? data.map((s) => s._id) : []),
-        loading: { ...get().loading, favourites: false },
-      });
-    } catch {
-      set({
-        favourites: [],
-        favouriteIds: new Set(),
-        loading: { ...get().loading, favourites: false },
-      });
-    }
-  },
-
-  addFavourite: async (shopId) => {
-    const token = get().token;
-    set((state) => ({
-      loading: { ...state.loading, favourites: true },
-    }));
-    try {
-      await fetch(FAV_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ shopId }),
-      });
-      await get().fetchFavourites();
-    } catch {
-      // Optionally handle error
-    } finally {
-      set((state) => ({
-        loading: { ...state.loading, favourites: false },
-      }));
-    }
-  },
-
-  removeFavourite: async (shopId) => {
-    const token = get().token;
-    set((state) => ({
-      loading: { ...state.loading, favourites: true },
-    }));
-    try {
-      await fetch(`${FAV_URL}/${shopId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      await get().fetchFavourites();
-    } catch {
-      // Optionally handle error
-    } finally {
-      set((state) => ({
-        loading: { ...state.loading, favourites: false },
-      }));
     }
   },
 }));

@@ -11,7 +11,6 @@ const siteUserSchema = new mongoose.Schema(
     resetPasswordToken: String,
     resetPasswordExpiresAt: Date,
     lastLogin: { type: Date, default: Date.now },
-    favourites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Shop" }]
   },
   { timestamps: true }
 );

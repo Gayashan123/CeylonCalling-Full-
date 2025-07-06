@@ -2,6 +2,7 @@ import express from "express";
 import {
   signup,
   login,
+  logout,
   verifyEmail,
   forgotPassword,
   resetPassword,
@@ -9,19 +10,21 @@ import {
   changePassword,
   updateProfile,
 } from "../controllers/siteUser.controller.js";
-import { siteUserAuth } from "../middlewares/siteUserAuth.js";
+import { sessionAuth } from "../middlewares/siteUserAuth.js";
 
 const router = express.Router();
 
+router.get("/check-auth", sessionAuth, checkAuth);
+
 router.post("/signup", signup);
 router.post("/login", login);
+router.post("/logout", logout);
+
 router.post("/verify-email", verifyEmail);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
-router.get("/check-auth", siteUserAuth, checkAuth);
 
-// Protected routes
-router.post("/change-password", siteUserAuth, changePassword);
-router.post("/update-profile", siteUserAuth, updateProfile);
+router.post("/change-password", sessionAuth, changePassword);
+router.post("/update-profile", sessionAuth, updateProfile);
 
 export default router;

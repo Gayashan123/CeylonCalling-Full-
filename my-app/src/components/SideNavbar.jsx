@@ -1,36 +1,16 @@
-// components/Navbar.jsx
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FaHome, FaCog, FaHeart, FaLocationArrow } from "react-icons/fa";
 
+
 import ContactModal from "./ContactModel";
-import FavouritesModal from "./Favourites"; // ✅ Import this
 
 function Navbar() {
   const navigate = useNavigate();
-
+  const [showFavorites, setShowFavorites] = useState(false);
   const [showContact, setShowContact] = useState(false);
-  const [showFavourite, setShowFavourite] = useState(false);
 
-  // ✅ Mock favourites data (Replace with real shared state later)
-  const [favourites, setFavourites] = useState([
-    {
-      _id: "1",
-      name: "Chicken Biryani",
-      price: 450,
-      picture: "/images/biryani.jpg",
-    },
-    {
-      _id: "2",
-      name: "Paneer Pizza",
-      price: 750,
-      picture: "/images/pizza.jpg",
-    },
-  ]);
-
-  const handleRemoveFavourite = (id) => {
-    setFavourites((prev) => prev.filter((item) => item._id !== id));
-  };
+ 
 
   const navItems = [
     {
@@ -41,7 +21,7 @@ function Navbar() {
     {
       icon: <FaHeart />,
       label: "Favorites",
-      onClick: () => setShowFavourite(true),
+      onClick: () => setShowFavorites(true),
     },
     {
       icon: <FaLocationArrow />,
@@ -78,16 +58,9 @@ function Navbar() {
         ))}
       </aside>
 
-      {/* Contact Modal */}
-      {showContact && <ContactModal onClose={() => setShowContact(false)} />}
+    
 
-      {/* Favourites Modal */}
-      <FavouritesModal
-        isOpen={showFavourite}
-        favourites={favourites}
-        onClose={() => setShowFavourite(false)}
-        onRemove={handleRemoveFavourite}
-      />
+      {showContact && <ContactModal onClose={() => setShowContact(false)} />}
     </>
   );
 }

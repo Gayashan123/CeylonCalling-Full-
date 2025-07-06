@@ -76,7 +76,7 @@ const ForgotPasswordPage = () => {
 
         <div className="border-t border-gray-200 px-8 py-4 bg-white/60 backdrop-blur-sm flex justify-center">
           <Link
-            to="/login"
+            to="/user/login"
             className="text-sm text-gray-700 hover:text-black flex items-center transition"
           >
             <ArrowLeft className="w-4 h-4 mr-1" /> Back to Login
