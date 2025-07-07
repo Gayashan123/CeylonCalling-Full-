@@ -5,6 +5,8 @@ import Navigation from "../../shopowner/components/SideNavbar";
 import { motion, AnimatePresence } from "framer-motion";
 import EditFood from "../components/EditFood";
 import ShopEditModal from "../components/ShopEdit";
+import ShopComments from "../components/CommentShow"
+
 
 const getDisplayImage = (photo) => {
   if (!photo) return "https://via.placeholder.com/600x300?text=No+Image";
@@ -329,6 +331,9 @@ const MyShop = () => {
           {showShopEdit && shop && <ShopEditModal shop={shop} onClose={() => setShowShopEdit(false)} />}
         </AnimatePresence>
       </div>
+
+
+<ShopComments shopId={shop._id} />
     </div>
   );
 };
