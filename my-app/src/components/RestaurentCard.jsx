@@ -5,11 +5,11 @@ import {
   FaPhoneAlt,
   FaClock,
   FaInfoCircle,
-  FaDollarSign,
+ 
 } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 
-function RestaurantCard({ shop, categories , shopType }) {
+function RestaurantCard({ shop, categories   }) {
   const navigate = useNavigate();
 
   return (

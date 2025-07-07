@@ -102,10 +102,10 @@ function Home() {
 
   // === FILTER LOGIC ===
   const filteredShops = shops.filter((shop) => {
-    // 1. Filter by shop type
-    const matchType = shopTypeFilter === "all" || shop.type === shopTypeFilter;
+    // 1. Shop Type Filter
+    const matchType = shopTypeFilter === "all" || shop.shopType === shopTypeFilter;
 
-    // 2. Filter by search (shop name or category)
+    // 2. Search Filter
     const searchLower = search.toLowerCase();
     const shopNameMatch = shop.name.toLowerCase().includes(searchLower);
     const categoryMatch = (shopCategories[shop._id] || []).some((cat) =>
@@ -113,15 +113,24 @@ function Home() {
     );
     const matchesSearch = !search || shopNameMatch || categoryMatch;
 
-    // 3. Filter by selected category
+    // 3. Category Filter
     const matchesCategory =
       !selectedCategory ||
-      (shopCategories[shop._id] || []).some((cat) => cat.name === selectedCategory);
+      (shopCategories[shop._id] || []).some(
+        (cat) => cat.name === selectedCategory
+      );
 
-    // 4. Filter by price range (priceRange assumed number or parseable)
-    const avgPrice = Number(shop.priceRange) || 0;
-    const matchesPrice = avgPrice >= priceFilter.min && avgPrice <= priceFilter.max;
+    // ✅ 4. Price Range Filter (NEW logic for "100 - 600" format)
+    const priceRangeStr = shop.priceRange || "";
+    const [minStr, maxStr] = priceRangeStr.split("-").map((s) => s.trim());
+    const minPrice = parseInt(minStr, 10) || 0;
+    const maxPrice = parseInt(maxStr, 10) || 0;
 
+   const matchesPrice =
+  minPrice <= priceFilter.max && maxPrice >= priceFilter.min;
+
+
+    // Final result:
     return matchType && matchesSearch && matchesCategory && matchesPrice;
   });
 
@@ -132,7 +141,9 @@ function Home() {
         {/* Categories */}
         <section className="mt-10">
           <div className="flex flex-col sm:flex-row sm:justify-between mt-20 items-start sm:items-end mb-4">
-            <h2 className="text-3xl font-bold text-gray-800">Explore Categories</h2>
+            <h2 className="text-3xl font-bold text-gray-800">
+              Explore Categories
+            </h2>
             <p className="text-sm text-gray-500 mt-1 sm:mt-0">
               Find your favorite food by category!
             </p>
@@ -155,44 +166,47 @@ function Home() {
                 },
               }}
             >
-             {/* "All" Button */}
-<motion.div
-  onClick={() => setSelectedCategory(null)}
-  className={`cursor-pointer px-4 py-2 rounded-full font-semibold shadow-md transition select-none
+              {/* "All" Button */}
+              <motion.div
+                onClick={() => setSelectedCategory(null)}
+                className={`cursor-pointer px-4 py-2 rounded-full font-semibold shadow-md transition select-none
     ${
       selectedCategory === null
         ? "bg-black text-white scale-105"
         : "bg-gray-300 text-gray-800 hover:bg-gray-400"
     }`}
-  initial={{ opacity: 0, y: 30 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.4, delay: 0 }}
->
-  All
-</motion.div>
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0 }}
+              >
+                All
+              </motion.div>
 
-{/* Other categories */}
-{allCategories.map((cat, i) => {
-  const isSelected = selectedCategory === cat.name;
-  return (
-    <motion.div
-      key={cat._id}
-      onClick={() => setSelectedCategory(isSelected ? null : cat.name)}
-      className={`cursor-pointer px-4 py-2 rounded-full font-semibold shadow-md transition select-none
+              {/* Other categories */}
+              {allCategories.map((cat, i) => {
+                const isSelected = selectedCategory === cat.name;
+                return (
+                  <motion.div
+                    key={cat._id}
+                    onClick={() =>
+                      setSelectedCategory(isSelected ? null : cat.name)
+                    }
+                    className={`cursor-pointer px-4 py-2 rounded-full font-semibold shadow-md transition select-none
         ${
           isSelected
             ? "bg-black text-white scale-105"
-            : `bg-gradient-to-r ${gradientColors[i % gradientColors.length]} text-white`
+            : `bg-gradient-to-r ${
+                gradientColors[i % gradientColors.length]
+              } text-white`
         }`}
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: (i + 1) * 0.04 }} // +1 for "All"
-    >
-      {cat.name}
-    </motion.div>
-  );
-})}
-
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: (i + 1) * 0.04 }} // +1 for "All"
+                  >
+                    {cat.name}
+                  </motion.div>
+                );
+              })}
             </motion.div>
           )}
         </section>
@@ -203,7 +217,12 @@ function Home() {
         <ShopTypeFilter value={shopTypeFilter} onChange={setShopTypeFilter} />
 
         {/* Price Filter */}
-        <PriceFilter min={0} max={5000} value={priceFilter} onChange={setPriceFilter} />
+        <PriceFilter
+          min={0}
+          max={5000}
+          value={priceFilter}
+          onChange={setPriceFilter}
+        />
 
         <hr className="my-8 border-0 h-1 bg-gradient-to-r from-pink-400 via-blue-400 to-green-400 rounded shadow-lg" />
 
@@ -216,7 +235,9 @@ function Home() {
           {loadingShops ? (
             <p>Loading shops...</p>
           ) : filteredShops.length === 0 ? (
-            <p className="text-gray-600 italic">No shops found matching your filters.</p>
+            <p className="text-gray-600 italic">
+              No shops found matching your filters.
+            </p>
           ) : (
             <motion.div
               className="flex flex-col gap-6"

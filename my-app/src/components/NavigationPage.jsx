@@ -32,7 +32,7 @@ function Navigation() {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-white border-b shadow-sm">
+    <header className="fixed top-0 left-0 w-full z-50 bg-white  shadow-sm">
       <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <div className="text-2xl font-bold text-blue-700 cursor-pointer" onClick={goToHome}>
