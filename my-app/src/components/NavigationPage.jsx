@@ -2,17 +2,12 @@ import React, { useState } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { FiSearch, FiMapPin } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-import { useSiteUserAuthStore } from '../store/siteUserAuthStore'; // Adjust the path as needed
+import { useSiteUserAuthStore } from '../store/siteUserAuthStore';
 
 function Navigation() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const logout = useSiteUserAuthStore(state => state.logout);
+  const { user } = useSiteUserAuthStore();
   const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/');
-  };
 
   const handleGetLocation = () => {
     navigator.geolocation.getCurrentPosition(
@@ -26,96 +21,94 @@ function Navigation() {
     );
   };
 
-  // Navigate to home on logo click
-  const goToHeader = () => {
-    navigate('/');
+  const goToHome = () => navigate('/');
+
+  const getInitials = (nameOrEmail) => {
+    if (!nameOrEmail) return "U";
+    const parts = nameOrEmail.trim().split(/\s+/);
+    return parts.length === 1
+      ? parts[0][0].toUpperCase()
+      : parts[0][0].toUpperCase() + parts[1][0].toUpperCase();
   };
 
   return (
-    <div className="fixed top-0 left-0 z-50 w-full bg-white shadow-lg backdrop-blur-lg">
-      <div className="max-w-screen-xl mx-auto px-4 py-4 flex justify-between items-center">
-        {/* Logo & Title */}
-        <div
-          onClick={goToHeader}
-          className="flex items-center gap-3 cursor-pointer select-none"
-          title="Go to Home"
-        >
-          <span className="text-2xl font-extrabold tracking-tight text-gray-900">
-            Ceylon Calling
-          </span>
+    <header className="fixed top-0 left-0 w-full z-50 bg-white border-b shadow-sm">
+      <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
+        {/* Logo */}
+        <div className="text-2xl font-bold text-blue-700 cursor-pointer" onClick={goToHome}>
+          Ceylon Calling
         </div>
 
-        {/* Search Input (Hidden on mobile) */}
-        <div className="hidden lg:flex flex-grow justify-center">
-          <div className="relative w-full max-w-2xl flex items-center rounded-full bg-white/60 backdrop-blur-md border border-white/40 shadow-sm transition-all">
-            <FiSearch className="absolute left-4 text-gray-500 text-lg" />
+        {/* Search (Desktop only) */}
+        <div className="hidden lg:block w-full max-w-md">
+          <div className="relative">
             <input
               type="text"
-              placeholder="Enter city, postal code..."
-              className="w-full py-2.5 pl-12 pr-32 text-sm text-gray-800 rounded-full bg-transparent focus:outline-none placeholder-gray-500"
+              placeholder="Search city, postal code..."
+              className="w-full pl-10 pr-32 py-2 rounded-full bg-gray-100 text-sm outline-none"
             />
+            <FiSearch className="absolute top-2.5 left-3 text-gray-500" />
             <button
               onClick={handleGetLocation}
-              className="absolute right-1.5 text-xs font-medium bg-gray-900 text-white px-4 py-1.5 rounded-full hover:bg-black transition flex items-center gap-1"
+              className="absolute right-2 top-1 bg-blue-700 text-white px-4 py-1.5 text-xs rounded-full flex items-center gap-1 hover:bg-blue-800 transition"
             >
-              <FiMapPin className="text-sm" />
-              Location
+              <FiMapPin /> Location
             </button>
           </div>
         </div>
 
-        {/* Desktop Auth Buttons */}
-        <div className="hidden md:flex items-center gap-4">
-          <button
-            onClick={handleLogout}
-            className="px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-full hover:from-purple-600 hover:to-pink-600 transition"
-          >
-            Log out
-          </button>
-        </div>
-
-        {/* Hamburger Menu for Mobile */}
-        <div className="md:hidden">
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="text-2xl text-gray-800 focus:outline-none"
-          >
-            {menuOpen ? <FaTimes /> : <FaBars />}
-          </button>
-        </div>
-      </div>
-
-      {/* Search Input (Mobile) */}
-      <div className="block lg:hidden px-4 pb-2">
-        <div className="relative w-full flex items-center rounded-full bg-white/60 backdrop-blur-md border border-white/40 shadow-sm transition-all">
-          <FiSearch className="absolute left-4 text-gray-500 text-lg" />
-          <input
-            type="text"
-            placeholder="Enter city, postal code..."
-            className="w-full py-2.5 pl-12 pr-32 text-sm text-gray-800 rounded-full bg-transparent focus:outline-none placeholder-gray-500"
-          />
-          <button
-            onClick={handleGetLocation}
-            className="absolute right-1.5 text-xs font-medium bg-gray-900 text-white px-4 py-1.5 rounded-full hover:bg-black transition flex items-center gap-1"
-          >
-            <FiMapPin className="text-sm" />
-            Location
-          </button>
+        {/* Right side: Avatar / Menu */}
+        <div className="flex items-center gap-4">
+          {user && (
+            <div className="hidden md:flex items-center gap-2">
+              <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-semibold flex items-center justify-center">
+                {getInitials(user.name || user.email)}
+              </div>
+              <span className="text-sm text-gray-800 truncate max-w-[100px]">
+                {user.name || user.email}
+              </span>
+            </div>
+          )}
+          {/* Mobile Menu Icon */}
+          <div className="md:hidden">
+            <button onClick={() => setMenuOpen(!menuOpen)} className="text-2xl text-gray-800">
+              {menuOpen ? <FaTimes /> : <FaBars />}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Mobile Menu Auth Buttons */}
+      {/* Mobile Search + Menu */}
       {menuOpen && (
-        <div className="px-4 py-3 md:hidden bg-white border-t border-gray-100 shadow-md">
-          <button
-            onClick={handleLogout}
-            className="w-full px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-full hover:from-purple-600 hover:to-pink-600"
-          >
-            Log out
-          </button>
+        <div className="block md:hidden px-4 py-3 bg-white border-t">
+          {/* Mobile Search */}
+          <div className="relative mb-3">
+            <input
+              type="text"
+              placeholder="Search city, postal code..."
+              className="w-full pl-10 pr-32 py-2 rounded-full bg-gray-100 text-sm outline-none"
+            />
+            <FiSearch className="absolute top-2.5 left-3 text-gray-500" />
+            <button
+              onClick={handleGetLocation}
+              className="absolute right-2 top-1 bg-blue-700 text-white px-3 py-1.5 text-xs rounded-full flex items-center gap-1 hover:bg-blue-800 transition"
+            >
+              <FiMapPin /> Location
+            </button>
+          </div>
+
+          {/* User Info */}
+          {user && (
+            <div className="flex items-center gap-3 mt-2">
+              <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center">
+                {getInitials(user.name || user.email)}
+              </div>
+              <span className="text-gray-800 text-sm">{user.name || user.email}</span>
+            </div>
+          )}
         </div>
       )}
-    </div>
+    </header>
   );
 }
 

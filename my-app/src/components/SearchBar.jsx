@@ -7,7 +7,7 @@ function SearchBar({ value, onChange, onSubmit, placeholder = "Search shops...."
         e.preventDefault();
         onSubmit?.();
       }}
-      className="w-full flex justify-center"
+      className="w-full flex justify-center px-4 sm:px-6 md:px-8 lg:px-0" // Responsive horizontal padding
       role="search"
       aria-label="Search"
     >
@@ -15,10 +15,12 @@ function SearchBar({ value, onChange, onSubmit, placeholder = "Search shops...."
         className="
           relative
           w-full
-          max-w-lg
-          sm:max-w-md
-          md:max-w-xl
-          lg:max-w-2xl
+          max-w-xs    // default max width for mobile
+          sm:max-w-sm // small devices (≥640px)
+          md:max-w-md // medium devices (≥768px)
+          lg:max-w-lg // large devices (≥1024px)
+          xl:max-w-xl // extra large (≥1280px)
+          2xl:max-w-2xl // 2xl screens (≥1536px)
           transition-all
         "
       >
@@ -34,9 +36,13 @@ function SearchBar({ value, onChange, onSubmit, placeholder = "Search shops...."
             rounded-full
             border border-gray-200
             bg-white
-            py-3 pl-12 pr-5
+            py-2        // smaller vertical padding on mobile
+            sm:py-3     // increased padding on sm and above
+            pl-10       // padding left to fit icon nicely
+            pr-5
             text-gray-800
-            text-base
+            text-sm      // smaller text on mobile
+            sm:text-base // base text on sm and above
             shadow-sm
             transition
             focus:outline-none
@@ -48,7 +54,7 @@ function SearchBar({ value, onChange, onSubmit, placeholder = "Search shops...."
           "
           aria-label={placeholder}
         />
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xl">
+        <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-lg sm:text-xl">
           <FiSearch />
         </span>
         <button
@@ -58,8 +64,9 @@ function SearchBar({ value, onChange, onSubmit, placeholder = "Search shops...."
             bg-blue-500 hover:bg-blue-600
             text-white
             rounded-full
-            px-4 py-1
-            text-sm font-semibold
+            px-3 py-1
+            text-xs sm:text-sm
+            font-semibold
             shadow
             transition-all
             focus:outline-none focus:ring-2 focus:ring-blue-400

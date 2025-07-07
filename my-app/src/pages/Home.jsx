@@ -7,7 +7,6 @@ import SearchBar from "../components/SearchBar";
 import PriceFilter from "../components/FilterSection";
 import ShopTypeFilter from "../components/ShopTypeFilter";
 
-// Import Framer Motion
 import { motion, AnimatePresence } from "framer-motion";
 
 function Home() {
@@ -19,11 +18,11 @@ function Home() {
   const [loadingShops, setLoadingShops] = useState(true);
   const [loadingFoods, setLoadingFoods] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(true);
+
   const [search, setSearch] = useState("");
   const [priceFilter, setPriceFilter] = useState({ min: 0, max: 5000 });
-
-  // ✅ Add filter state
   const [shopTypeFilter, setShopTypeFilter] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
     setLoadingCategories(true);
@@ -101,22 +100,39 @@ function Home() {
     "from-sky-400 to-blue-500",
   ];
 
-  // ✅ Filtered shops based on selection
-  const filteredShops =
-    shopTypeFilter === "all"
-      ? shops
-      : shops.filter((shop) => shop.type === shopTypeFilter);
+  // === FILTER LOGIC ===
+  const filteredShops = shops.filter((shop) => {
+    // 1. Filter by shop type
+    const matchType = shopTypeFilter === "all" || shop.type === shopTypeFilter;
+
+    // 2. Filter by search (shop name or category)
+    const searchLower = search.toLowerCase();
+    const shopNameMatch = shop.name.toLowerCase().includes(searchLower);
+    const categoryMatch = (shopCategories[shop._id] || []).some((cat) =>
+      cat.name.toLowerCase().includes(searchLower)
+    );
+    const matchesSearch = !search || shopNameMatch || categoryMatch;
+
+    // 3. Filter by selected category
+    const matchesCategory =
+      !selectedCategory ||
+      (shopCategories[shop._id] || []).some((cat) => cat.name === selectedCategory);
+
+    // 4. Filter by price range (priceRange assumed number or parseable)
+    const avgPrice = Number(shop.priceRange) || 0;
+    const matchesPrice = avgPrice >= priceFilter.min && avgPrice <= priceFilter.max;
+
+    return matchType && matchesSearch && matchesCategory && matchesPrice;
+  });
 
   return (
     <div className="relative flex flex-col min-h-screen bg-white font-sans">
       <Navigation />
-      <main className="flex-grow pb-24 px-4 sm:px-8">
+      <main className="flex-grow pb-24 px-4 sm:px-8 max-w-screen-xl mx-auto">
         {/* Categories */}
-        <section className="mt-35">
-          <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-end mb-4">
-            <h2 className="text-3xl font-bold text-gray-800">
-              Explore Categories
-            </h2>
+        <section className="mt-10">
+          <div className="flex flex-col sm:flex-row sm:justify-between mt-20 items-start sm:items-end mb-4">
+            <h2 className="text-3xl font-bold text-gray-800">Explore Categories</h2>
             <p className="text-sm text-gray-500 mt-1 sm:mt-0">
               Find your favorite food by category!
             </p>
@@ -135,49 +151,72 @@ function Home() {
                 visible: {
                   transition: {
                     staggerChildren: 0.05,
-                  }
-                }
+                  },
+                },
               }}
             >
-              {allCategories.map((cat, i) => (
-                <motion.div
-                  key={cat._id}
-                  className={`bg-gradient-to-r ${
-                    gradientColors[i % gradientColors.length]
-                  } text-white text-sm px-4 py-2 rounded-full font-semibold shadow-md cursor-pointer hover:scale-105 transition`}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: i * 0.04 }}
-                >
-                  {cat.name}
-                </motion.div>
-              ))}
+             {/* "All" Button */}
+<motion.div
+  onClick={() => setSelectedCategory(null)}
+  className={`cursor-pointer px-4 py-2 rounded-full font-semibold shadow-md transition select-none
+    ${
+      selectedCategory === null
+        ? "bg-black text-white scale-105"
+        : "bg-gray-300 text-gray-800 hover:bg-gray-400"
+    }`}
+  initial={{ opacity: 0, y: 30 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.4, delay: 0 }}
+>
+  All
+</motion.div>
+
+{/* Other categories */}
+{allCategories.map((cat, i) => {
+  const isSelected = selectedCategory === cat.name;
+  return (
+    <motion.div
+      key={cat._id}
+      onClick={() => setSelectedCategory(isSelected ? null : cat.name)}
+      className={`cursor-pointer px-4 py-2 rounded-full font-semibold shadow-md transition select-none
+        ${
+          isSelected
+            ? "bg-black text-white scale-105"
+            : `bg-gradient-to-r ${gradientColors[i % gradientColors.length]} text-white`
+        }`}
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: (i + 1) * 0.04 }} // +1 for "All"
+    >
+      {cat.name}
+    </motion.div>
+  );
+})}
+
             </motion.div>
           )}
         </section>
+
         <hr className="my-10 border-0 h-1 bg-gradient-to-r from-fuchsia-500 via-indigo-400 to-cyan-400 rounded-full shadow-xl opacity-70" />
+
+        {/* Shop Type Filter */}
         <ShopTypeFilter value={shopTypeFilter} onChange={setShopTypeFilter} />
 
-        <PriceFilter
-          min={0}
-          max={5000}
-          value={priceFilter}
-          onChange={setPriceFilter}
-        />
-        <hr className="my-8 border-0 h-1 bg-gradient-to-r from-pink-400 via-blue-400 to-green-400 rounded shadow-lg" />
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-          onSubmit={() => {
-            /* handle search/filter logic here */
-          }}
-        />
+        {/* Price Filter */}
+        <PriceFilter min={0} max={5000} value={priceFilter} onChange={setPriceFilter} />
 
-        {/* Shops */}
+        <hr className="my-8 border-0 h-1 bg-gradient-to-r from-pink-400 via-blue-400 to-green-400 rounded shadow-lg" />
+
+        {/* Search Bar */}
+        <SearchBar value={search} onChange={setSearch} onSubmit={() => {}} />
+
+        {/* Shops Section */}
         <section>
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Shops</h2>
           {loadingShops ? (
             <p>Loading shops...</p>
+          ) : filteredShops.length === 0 ? (
+            <p className="text-gray-600 italic">No shops found matching your filters.</p>
           ) : (
             <motion.div
               className="flex flex-col gap-6"
@@ -185,7 +224,7 @@ function Home() {
               animate="visible"
               variants={{
                 hidden: {},
-                visible: { transition: { staggerChildren: 0.07 } }
+                visible: { transition: { staggerChildren: 0.07 } },
               }}
             >
               {filteredShops.map((shop, idx) => (
@@ -229,6 +268,7 @@ function Home() {
                   setSelectedShop(null);
                   setFoods([]);
                 }}
+                aria-label="Close food menu modal"
               >
                 &times;
               </button>
@@ -244,7 +284,7 @@ function Home() {
                   animate="visible"
                   variants={{
                     hidden: {},
-                    visible: { transition: { staggerChildren: 0.06 } }
+                    visible: { transition: { staggerChildren: 0.06 } },
                   }}
                 >
                   {foods.map((food, idx) => (
