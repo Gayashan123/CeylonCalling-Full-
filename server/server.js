@@ -13,6 +13,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import foodRoutes from "./routes/foodRoutes.js";
 import authRoutes from "./routes/auth.route.js";
 import siteUserRoutes from "./routes/siteUser.routes.js";
+import commentRoutes from "./routes/comment.route.js"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -70,6 +71,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/food", foodRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/siteuser", siteUserRoutes);
+app.use("/api/comments",commentRoutes)
 
 // Production client serve
 if (process.env.NODE_ENV === "production") {
