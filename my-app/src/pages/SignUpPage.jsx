@@ -4,26 +4,35 @@ import { User, Mail, Lock, Eye, EyeOff, Loader, Home } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import PasswordStrengthMeter from "../shopowner/components/PasswordStrengthMeter";
 import Input from "../shopowner/components/Input";
-import { useSiteUserAuthStore}  from "../store/siteUserAuthStore";
+import { useSiteUserAuthStore } from "../store/siteUserAuthStore";
 
-const SignUpPage = () => {
+const SiteUserSignUpPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
-  const { signup, error, isLoading } =useSiteUserAuthStore();
+  const { signup, error, isLoading } = useSiteUserAuthStore();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+
     if (!name.trim() || !email.trim() || !password.trim()) {
       alert("Please fill in all fields.");
       return;
     }
+
     try {
       await signup(email, password, name);
-      navigate("/user/verify-email");
+      
+      // Navigate first
+      navigate("/verify-email1");
+
+      // Refresh the page shortly after navigating
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     } catch (err) {
       console.error("Signup failed:", err);
     }
@@ -37,10 +46,6 @@ const SignUpPage = () => {
       className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-gray-50 via-white to-gray-100 px-6"
     >
       <div className="relative max-w-md w-full bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl p-10 sm:p-12">
-        {/* Apple-style background light effect */}
-        <div className="absolute -top-24 left-[60%] w-60 h-60 bg-gradient-to-br from-blue-400/10 to-purple-300/10 blur-2xl rounded-full pointer-events-none z-0" />
-
-        {/* Top Home Icon */}
         <Link
           to="/userlogui"
           className="absolute top-4 left-4 text-gray-600 hover:text-black transition z-10"
@@ -124,4 +129,4 @@ const SignUpPage = () => {
   );
 };
 
-export default SignUpPage;
+export default SiteUserSignUpPage;

@@ -10,7 +10,6 @@ const SHOP_URL =
     ? "http://localhost:5000/api/shops"
     : "/api/shops";
 
-// Always send credentials (cookies)
 axios.defaults.withCredentials = true;
 
 export const useAuthStore = create((set, get) => ({
@@ -129,10 +128,11 @@ export const useAuthStore = create((set, get) => ({
       await get().fetchShop();
     } catch (error) {
       set({
-        error: null,
+        user: null,
+        shop: null,
         isCheckingAuth: false,
         isAuthenticated: false,
-        shop: null,
+        error: null,
       });
     }
   },
@@ -142,7 +142,7 @@ export const useAuthStore = create((set, get) => ({
       const shopResponse = await axios.get(`${SHOP_URL}/my-shop`);
       set({ shop: shopResponse.data.shop });
     } catch (error) {
-      set({ shop: null }); // If user has no shop yet
+      set({ shop: null });
     }
   },
 

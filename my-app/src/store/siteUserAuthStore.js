@@ -1,13 +1,12 @@
 import { create } from "zustand";
 import axios from "axios";
 
-// Adjust API URL as needed
 const API_URL =
   import.meta.env.MODE === "development"
     ? "http://localhost:5000/api/siteuser"
     : "/api/siteuser";
 
-axios.defaults.withCredentials = true; // Important: send cookies with requests
+axios.defaults.withCredentials = true;
 
 export const useSiteUserAuthStore = create((set, get) => ({
   user: null,
@@ -20,7 +19,6 @@ export const useSiteUserAuthStore = create((set, get) => ({
     set({ isLoading: true, error: null, message: null });
     try {
       await axios.post(`${API_URL}/signup`, { email, password, name });
-      // Signup usually requires email verification before login
       set({ isLoading: false, message: "Signup successful. Please verify your email." });
     } catch (error) {
       set({

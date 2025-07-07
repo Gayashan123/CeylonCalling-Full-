@@ -6,7 +6,7 @@ import Input from "../shopowner/components/Input";
 import { Lock } from "lucide-react";
 import toast from "react-hot-toast";
 
-const ResetPasswordPage = () => {
+const SiteUserResetPasswordPage = () => {
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const { resetPassword, error, isLoading, message } =useSiteUserAuthStore();
@@ -81,4 +81,4 @@ const ResetPasswordPage = () => {
 		</motion.div>
 	);
 };
-export default ResetPasswordPage;
+export default SiteUserResetPasswordPage;

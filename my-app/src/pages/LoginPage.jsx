@@ -4,7 +4,7 @@ import { Mail, Lock, Loader, Eye, EyeOff, Home } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSiteUserAuthStore } from "../store/siteUserAuthStore";
 
-const LoginPage = () => {
+const SiteUserLoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -121,4 +121,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default SiteUserLoginPage;

@@ -5,7 +5,7 @@ import Input from "../shopowner/components/Input";
 import { ArrowLeft, Loader, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const ForgotPasswordPage = () => {
+const SiteUserForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { isLoading, forgotPassword } = useSiteUserAuthStore();
@@ -87,4 +87,4 @@ const ForgotPasswordPage = () => {
   );
 };
 
-export default ForgotPasswordPage;
+export default SiteUserForgotPasswordPage;

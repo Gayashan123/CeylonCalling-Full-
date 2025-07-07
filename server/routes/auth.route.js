@@ -8,7 +8,7 @@ import {
   resetPassword,
   checkAuth,
   changePassword,
-  updateProfile
+  updateProfile,
 } from "../controllers/auth.controllers.js";
 import { sessionAuth } from "../middlewares/sessionAuth.js";
 
@@ -24,8 +24,7 @@ router.post("/verify-email", verifyEmail);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 
-// IMPORTANT: protect this route
 router.post("/change-password", sessionAuth, changePassword);
-// Add this route:
 router.post("/update-profile", sessionAuth, updateProfile);
+
 export default router;

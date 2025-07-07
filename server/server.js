@@ -12,12 +12,11 @@ import shopRoutes from "./routes/shopRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import foodRoutes from "./routes/foodRoutes.js";
 import authRoutes from "./routes/auth.route.js";
-import siteUserRoutes from "./routes/siteUser.routes.js"; // <--- ADD THIS LINE
+import siteUserRoutes from "./routes/siteUser.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load .env
 dotenv.config({ path: path.join(__dirname, "config", ".env") });
 
 if (!process.env.DB_URL) throw new Error("DB_URL is not set in .env!");
@@ -25,7 +24,6 @@ if (!process.env.SESSION_SECRET) throw new Error("SESSION_SECRET is not set in .
 
 const app = express();
 
-// CORS config for Vite dev server (React) on port 5173
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -38,7 +36,6 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// SESSION config, for local development (HTTP only)
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -52,16 +49,14 @@ app.use(
     cookie: {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7,
-      secure: false,      // <---- for dev, never true on HTTP
-      sameSite: "lax",    // <---- for dev, only use 'none' if HTTPS
+      secure: false,
+      sameSite: "lax",
     },
   })
 );
 
-// Static uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Test endpoint
 app.get("/", (req, res) => {
   res.json({
     status: "Server running",
@@ -70,14 +65,13 @@ app.get("/", (req, res) => {
   });
 });
 
-// Routes
 app.use("/api/shops", shopRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/food", foodRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/siteuser", siteUserRoutes); // <--- ADD THIS LINE
+app.use("/api/siteuser", siteUserRoutes);
 
-// Production build serving (not used in dev)
+// Production client serve
 if (process.env.NODE_ENV === "production") {
   const clientDistPath = path.join(__dirname, "../my-app/dist");
   app.use(express.static(clientDistPath));
@@ -86,7 +80,6 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-// Start server after DB connection
 const PORT = process.env.PORT || 5000;
 
 connectDB()

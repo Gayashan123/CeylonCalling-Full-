@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useSiteUserAuthStore } from "../store/siteUserAuthStore";
 import toast from "react-hot-toast";
 
-const EmailVerificationPage = () => {
+const SiteUserEmailVerificationPage = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
@@ -22,34 +22,41 @@ const EmailVerificationPage = () => {
       setCode(newCode);
       const lastFilledIndex = newCode.findLastIndex((digit) => digit !== "");
       const focusIndex = lastFilledIndex < 5 ? lastFilledIndex + 1 : 5;
-      inputRefs.current[focusIndex].focus();
+      inputRefs.current[focusIndex]?.focus();
     } else {
       newCode[index] = value;
       setCode(newCode);
       if (value && index < 5) {
-        inputRefs.current[index + 1].focus();
+        inputRefs.current[index + 1]?.focus();
       }
     }
   };
 
   const handleKeyDown = (index, e) => {
     if (e.key === "Backspace" && !code[index] && index > 0) {
-      inputRefs.current[index - 1].focus();
+      inputRefs.current[index - 1]?.focus();
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const verificationCode = code.join("");
+
     try {
       await verifyEmail(verificationCode);
       toast.success("Email verified successfully!");
-      navigate("/user/login"); // <-- Redirect to login page
+      navigate("/user/dashboard");
+
+      // Auto-refresh after short delay
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     } catch (error) {
-      console.log(error);
+      console.error("Verification failed:", error);
     }
   };
 
+  // Auto-submit if all digits are filled
   useEffect(() => {
     if (code.every((digit) => digit !== "")) {
       handleSubmit(new Event("submit"));
@@ -65,12 +72,8 @@ const EmailVerificationPage = () => {
       className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-gray-100 to-gray-200 px-4"
     >
       <div className="w-full max-w-md bg-white/80 backdrop-blur-lg border border-gray-200 shadow-2xl rounded-3xl p-10 sm:p-12">
-        <h2 className="text-3xl font-semibold text-center text-gray-900 mb-6">
-          Verify Your Email
-        </h2>
-        <p className="text-center text-gray-600 mb-6 text-sm">
-          Enter the 6-digit code we sent to your email address.
-        </p>
+        <h2 className="text-3xl font-semibold text-center text-gray-900 mb-6">Verify Your Email</h2>
+        <p className="text-center text-gray-600 mb-6 text-sm">Enter the 6-digit code we sent to your email address.</p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex justify-between gap-2">
@@ -88,9 +91,7 @@ const EmailVerificationPage = () => {
             ))}
           </div>
 
-          {error && (
-            <p className="text-center text-red-500 font-medium text-sm">{error}</p>
-          )}
+          {error && <p className="text-center text-red-500 font-medium text-sm">{error}</p>}
 
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -107,4 +108,4 @@ const EmailVerificationPage = () => {
   );
 };
 
-export default EmailVerificationPage;
+export default SiteUserEmailVerificationPage;

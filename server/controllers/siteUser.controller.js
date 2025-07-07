@@ -174,14 +174,14 @@ export const checkAuth = async (req, res) => {
 
 // CHANGE PASSWORD (Protected)
 export const changePassword = async (req, res) => {
-  const userId = req.session.siteuserId;
+  const siteuserId = req.session.siteuserId;
   const { currentPassword, newPassword } = req.body;
   try {
-    if (!userId) return res.status(401).json({ success: false, message: "Not authenticated" });
+    if (!siteuserId) return res.status(401).json({ success: false, message: "Not authenticated" });
     if (!currentPassword || !newPassword) return res.status(400).json({ success: false, message: "All fields are required" });
     if (newPassword.length < 6) return res.status(400).json({ success: false, message: "New password must be at least 6 characters" });
 
-    const user = await SiteUser.findById(userId);
+    const user = await SiteUser.findById(siteuserId);
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
@@ -201,16 +201,16 @@ export const changePassword = async (req, res) => {
 
 // UPDATE PROFILE (Protected)
 export const updateProfile = async (req, res) => {
-  const userId = req.session.siteuserId;
+  const siteuserId = req.session.siteuserId;
   const { name, email } = req.body;
   try {
-    if (!userId) return res.status(401).json({ success: false, message: "Not authenticated" });
+    if (!siteuserId) return res.status(401).json({ success: false, message: "Not authenticated" });
     if (!name || !email) return res.status(400).json({ success: false, message: "All fields are required" });
 
-    const existingUser = await SiteUser.findOne({ email, _id: { $ne: userId } });
+    const existingUser = await SiteUser.findOne({ email, _id: { $ne: siteuserId } });
     if (existingUser) return res.status(400).json({ success: false, message: "Email is already taken" });
 
-    const user = await SiteUser.findById(userId);
+    const user = await SiteUser.findById(siteuserId);
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
     user.name = name;

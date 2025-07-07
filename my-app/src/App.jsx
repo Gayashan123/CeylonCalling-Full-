@@ -212,7 +212,7 @@ function App() {
             </SiteUserRedirectAuthenticatedUser>
           }
         />
-        <Route path="/user/verify-email" element={<SiteUserEmailVerificationPage />} />
+        <Route path="/verify-email1" element={<SiteUserEmailVerificationPage />} />
         <Route
           path="/user/forgot-password"
           element={
