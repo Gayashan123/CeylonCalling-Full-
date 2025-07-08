@@ -14,6 +14,8 @@ import foodRoutes from "./routes/foodRoutes.js";
 import authRoutes from "./routes/auth.route.js";
 import siteUserRoutes from "./routes/siteUser.routes.js";
 import commentRoutes from "./routes/comment.route.js"
+import placesRoutes from "./routes/place.route.js"
+import placeCategory from "./routes/place.catego.route.js";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -73,6 +75,8 @@ app.use("/api/food", foodRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/siteuser", siteUserRoutes);
 app.use("/api/comments",commentRoutes);
+app.use("/api/place",placesRoutes);
+app.use("/api/placecat",placeCategory);
 
 
 // Production client serve

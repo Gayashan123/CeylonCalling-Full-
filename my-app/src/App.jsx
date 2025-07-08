@@ -28,14 +28,14 @@ import ShopOwnerResetPasswordPage from "./shopowner/pages/ResetPasswordPage";
 // Site User Pages
 import UserLogUi from "./pages/UserLogUi";
 import UserDashboard from "./pages/Home";
-{/*import UserProfile from "./pages/UserProfile";*/}
+import UserProfile from "./pages/Addplace"
 import SiteUserSignUpPage from "./pages/SignUpPage";
 import SiteUserLoginPage from "./pages/LoginPage";
 import SiteUserEmailVerificationPage from "./pages/UserEmailVerificationPage";
 import SiteUserForgotPasswordPage from "./pages/UserForgotPasswordPage";
 import SiteUserResetPasswordPage from "./pages/UserResetPasswordPage";
 import UserSettings from "./pages/UserSettings";
-
+ 
 // Components
 import LoadingSpinner from "./shopowner/components/LoadingSpinner";
 
@@ -252,7 +252,7 @@ function App() {
        
 
 
-        {/*<Route
+        <Route
           path="/user/profile"
           element={
             <SiteUserProtectedRoute>
@@ -260,7 +260,7 @@ function App() {
             </SiteUserProtectedRoute>
           }
         />
-*/}
+
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

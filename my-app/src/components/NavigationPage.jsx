@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
-import { FiSearch, FiMapPin } from 'react-icons/fi';
+import { FiSearch, FiMapPin, FiMap, FiShoppingBag } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { useSiteUserAuthStore } from '../store/siteUserAuthStore';
 
@@ -22,6 +22,8 @@ function Navigation() {
   };
 
   const goToHome = () => navigate('/');
+  const goToShop = () => navigate('/my-shop');
+  const goToPlaces = () => navigate('/user/profile');
 
   const getInitials = (nameOrEmail) => {
     if (!nameOrEmail) return "U";
@@ -32,7 +34,7 @@ function Navigation() {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-white  shadow-sm">
+    <header className="fixed top-0 left-0 w-full z-50 bg-white shadow-sm">
       <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <div className="text-2xl font-bold text-blue-700 cursor-pointer" onClick={goToHome}>
@@ -57,18 +59,20 @@ function Navigation() {
           </div>
         </div>
 
-        {/* Right side: Avatar / Menu */}
+        {/* Right side: Icons + Avatar + Menu */}
         <div className="flex items-center gap-4">
-          {user && (
-            <div className="hidden md:flex items-center gap-2">
-              <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-semibold flex items-center justify-center">
-                {getInitials(user.name || user.email)}
-              </div>
-              <span className="text-sm text-gray-800 truncate max-w-[100px]">
-                {user.name || user.email}
-              </span>
-            </div>
-          )}
+          {/* Shop & Places Links (Desktop & Tablet) */}
+          <div className="hidden sm:flex items-center gap-3 text-gray-700 text-xl">
+            <button onClick={goToShop} className="hover:text-blue-600">
+              <FiShoppingBag />
+            </button>
+            <button onClick={goToPlaces} className="hover:text-blue-600">
+              <FiMap />
+            </button>
+          </div>
+
+          
+
           {/* Mobile Menu Icon */}
           <div className="md:hidden">
             <button onClick={() => setMenuOpen(!menuOpen)} className="text-2xl text-gray-800">
@@ -78,11 +82,11 @@ function Navigation() {
         </div>
       </div>
 
-      {/* Mobile Search + Menu */}
+      {/* Mobile Dropdown Menu */}
       {menuOpen && (
-        <div className="block md:hidden px-4 py-3 bg-white border-t">
-          {/* Mobile Search */}
-          <div className="relative mb-3">
+        <div className="block md:hidden px-4 py-3 bg-white border-t space-y-3">
+          {/* Search */}
+          <div className="relative">
             <input
               type="text"
               placeholder="Search city, postal code..."
@@ -97,15 +101,18 @@ function Navigation() {
             </button>
           </div>
 
+          {/* Nav Links */}
+          <div className="flex gap-5 text-xl text-gray-700">
+            <button onClick={goToShop} className="flex items-center gap-2 hover:text-blue-600">
+              <FiShoppingBag /> <span className="text-sm">Shop</span>
+            </button>
+            <button onClick={goToPlaces} className="flex items-center gap-2 hover:text-blue-600">
+              <FiMap /> <span className="text-sm">Places</span>
+            </button>
+          </div>
+
           {/* User Info */}
-          {user && (
-            <div className="flex items-center gap-3 mt-2">
-              <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center">
-                {getInitials(user.name || user.email)}
-              </div>
-              <span className="text-gray-800 text-sm">{user.name || user.email}</span>
-            </div>
-          )}
+          
         </div>
       )}
     </header>
