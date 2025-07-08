@@ -231,7 +231,13 @@ function Home() {
 
         {/* Shops Section */}
         <section>
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Shops</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+  {shopTypeFilter === "all"
+    ? "All Shops"
+    : `${shopTypeFilter.charAt(0).toUpperCase()}${shopTypeFilter.slice(1)} `}
+</h2>
+
+
           {loadingShops ? (
             <p>Loading shops...</p>
           ) : filteredShops.length === 0 ? (

@@ -9,7 +9,7 @@ const SHOP_TYPES = [
     active: "bg-blue-500 text-white shadow-lg",
   },
   {
-    key: "smallshop",
+    key: "small food shops",
     label: "Small Food Shops",
     icon: <FaStore className="text-green-400" />,
     pill: "bg-green-50 text-green-700",
@@ -17,7 +17,7 @@ const SHOP_TYPES = [
   },
   {
     key: "restaurant",
-    label: "Restaurant",
+    label: "Restaurants",
     icon: <FaHome className="text-purple-400" />,
     pill: "bg-purple-50 text-purple-700",
     active: "bg-purple-500 text-white shadow-lg",
