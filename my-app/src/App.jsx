@@ -28,7 +28,7 @@ import ShopOwnerResetPasswordPage from "./shopowner/pages/ResetPasswordPage";
 // Site User Pages
 import UserLogUi from "./pages/UserLogUi";
 import UserDashboard from "./pages/Home";
-import UserProfile from "./pages/Addplace"
+import UserProfile from "./pages/ProfileUser"
 import SiteUserSignUpPage from "./pages/SignUpPage";
 import SiteUserLoginPage from "./pages/LoginPage";
 import SiteUserEmailVerificationPage from "./pages/UserEmailVerificationPage";

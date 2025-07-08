@@ -1,27 +1,17 @@
-import React, { useState } from "react";
-import { FaHome, FaUtensils, FaCog, FaPlus, FaStore, FaTags } from "react-icons/fa";
+import  { useState } from "react";
+import { FaHome, FaPlus, FaCog, FaTags, FaMapMarkerAlt } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence } from "framer-motion";
 
-import AddPlace from "./AddPlace"; // Make sure this component exists
-import AddCategory from "./AddLocationCategory"; // Make sure this component exists
+import AddPlace from "./AddPlace"; // Modal component for adding a Place
+import AddCategory from "./AddLocationCategory"; // Modal component for adding a Category
 
-function Navbar({ onOpenSettings, onViewAllFoods }) {
+function BottomNav() {
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [showAddPlaceModal, setShowAddPlaceModal] = useState(false);
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
-  const [categories, setCategories] = useState([]);
 
   const navigate = useNavigate();
-
-  const handleAddCategory = (newCategory) => {
-    setCategories((prev) => [...prev, newCategory]);
-    setShowAddCategoryModal(false);
-  };
-
-  const handleAddPlace = () => {
-    setShowAddPlaceModal(false);
-  };
 
   return (
     <>
@@ -29,18 +19,18 @@ function Navbar({ onOpenSettings, onViewAllFoods }) {
         {/* Home */}
         <button
           onClick={() => navigate("/user/dashboard")}
-          className="group relative flex flex-col items-center justify-center gap-0.5 sm:gap-1 text-gray-600 hover:text-purple-600 transition cursor-pointer text-xs sm:text-sm lowercase sm:normal-case"
+          className="flex flex-col items-center justify-center text-gray-600 hover:text-purple-600 transition cursor-pointer text-xs sm:text-sm"
           aria-label="Home"
           type="button"
         >
           <FaHome className="text-lg sm:text-xl" />
-          <span className="tooltip">home</span>
+          <span className="sr-only">home</span>
         </button>
 
         {/* Floating Add (+) */}
         <div className="relative">
           <button
-            onClick={() => setShowAddMenu(!showAddMenu)}
+            onClick={() => setShowAddMenu((m) => !m)}
             className="w-12 h-12 sm:w-14 sm:h-14 bg-purple-600 hover:bg-purple-700 text-white rounded-full flex items-center justify-center shadow-lg border-4 border-white -mt-8 sm:-mt-10 transition"
             aria-label="Add Menu"
             type="button"
@@ -50,7 +40,7 @@ function Navbar({ onOpenSettings, onViewAllFoods }) {
 
           {showAddMenu && (
             <div
-              className="absolute bottom-14 sm:bottom-16 left-1/2 transform -translate-x-1/2 bg-white shadow-xl rounded-xl p-2 sm:p-3 flex flex-col gap-1.5 sm:gap-2 z-50 w-36 sm:w-44"
+              className="absolute bottom-14 sm:bottom-16 left-1/2 transform -translate-x-1/2 bg-white shadow-xl rounded-xl p-2 sm:p-3 flex flex-col gap-2 z-50 w-36 sm:w-44"
               role="menu"
               aria-label="Add Menu Options"
             >
@@ -59,18 +49,18 @@ function Navbar({ onOpenSettings, onViewAllFoods }) {
                   setShowAddPlaceModal(true);
                   setShowAddMenu(false);
                 }}
-                className="flex items-center gap-2 hover:bg-gray-100 px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm text-gray-700 transition lowercase sm:normal-case"
+                className="flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-md text-xs sm:text-sm text-gray-700 transition"
                 type="button"
                 role="menuitem"
               >
-                <FaUtensils /> Add Place
+                <FaMapMarkerAlt /> Add Place
               </button>
               <button
                 onClick={() => {
                   setShowAddCategoryModal(true);
                   setShowAddMenu(false);
                 }}
-                className="flex items-center gap-2 hover:bg-gray-100 px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm text-gray-700 transition lowercase sm:normal-case"
+                className="flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-md text-xs sm:text-sm text-gray-700 transition"
                 type="button"
                 role="menuitem"
               >
@@ -83,12 +73,12 @@ function Navbar({ onOpenSettings, onViewAllFoods }) {
         {/* Settings */}
         <button
           onClick={() => navigate("/user/settings")}
-          className="group relative flex flex-col items-center justify-center gap-0.5 sm:gap-1 text-gray-600 hover:text-purple-600 transition cursor-pointer text-xs sm:text-sm lowercase sm:normal-case"
+          className="flex flex-col items-center justify-center text-gray-600 hover:text-purple-600 transition cursor-pointer text-xs sm:text-sm"
           aria-label="Settings"
           type="button"
         >
           <FaCog className="text-lg sm:text-xl" />
-          <span className="tooltip">settings</span>
+          <span className="sr-only">settings</span>
         </button>
       </aside>
 
@@ -97,14 +87,12 @@ function Navbar({ onOpenSettings, onViewAllFoods }) {
         {showAddPlaceModal && (
           <AddPlace 
             onClose={() => setShowAddPlaceModal(false)}
-            onAddPlace={handleAddPlace}
           />
         )}
 
         {showAddCategoryModal && (
           <AddCategory
             onClose={() => setShowAddCategoryModal(false)}
-            onAddCategory={handleAddCategory}
           />
         )}
       </AnimatePresence>
@@ -112,4 +100,4 @@ function Navbar({ onOpenSettings, onViewAllFoods }) {
   );
 }
 
-export default Navbar;
+export default BottomNav;

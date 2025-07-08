@@ -1,27 +1,27 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { FaHome, FaCog, FaHeart, FaLocationArrow } from "react-icons/fa";
+import { FaStore, FaCog,  FaUserCircle,FaPlaneDeparture} from "react-icons/fa";
 import ContactModal from "./ContactModel";
 
 function Navbar() {
   const navigate = useNavigate();
-  const [showFavorites, setShowFavorites] = useState(false);
+  
   const [showContact, setShowContact] = useState(false);
 
   const navItems = [
+     {
+      icon: < FaUserCircle />,
+      label: "Profile",
+      onClick: () => navigate("/user/profile"),
+    },
     {
-      icon: <FaHome />,
-      label: "Home",
+     icon: <FaStore />,
+      label: "Shops",
       onClick: () => navigate("/user/dashboard"),
     },
     {
-      icon: <FaHeart />,
-      label: "Favorites",
-      onClick: () => setShowFavorites(true),
-    },
-    {
-      icon: <FaLocationArrow />,
-      label: "Contact",
+      icon: <FaPlaneDeparture />,
+      label: "Travel Locations",
       onClick: () => setShowContact(true),
     },
     {
