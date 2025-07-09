@@ -61,15 +61,7 @@ function Navigation() {
 
         {/* Right side: Icons + Avatar + Menu */}
         <div className="flex items-center gap-4">
-          {/* Shop & Places Links (Desktop & Tablet) */}
-          <div className="hidden sm:flex items-center gap-3 text-gray-700 text-xl">
-            <button onClick={goToShop} className="hover:text-blue-600">
-              <FiShoppingBag />
-            </button>
-            <button onClick={goToPlaces} className="hover:text-blue-600">
-              <FiMap />
-            </button>
-          </div>
+          
 
           
 
@@ -101,15 +93,7 @@ function Navigation() {
             </button>
           </div>
 
-          {/* Nav Links */}
-          <div className="flex gap-5 text-xl text-gray-700">
-            <button onClick={goToShop} className="flex items-center gap-2 hover:text-blue-600">
-              <FiShoppingBag /> <span className="text-sm">Shop</span>
-            </button>
-            <button onClick={goToPlaces} className="flex items-center gap-2 hover:text-blue-600">
-              <FiMap /> <span className="text-sm">Places</span>
-            </button>
-          </div>
+          
 
           {/* User Info */}
           

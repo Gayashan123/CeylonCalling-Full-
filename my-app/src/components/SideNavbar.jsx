@@ -22,7 +22,7 @@ function Navbar() {
     {
       icon: <FaPlaneDeparture />,
       label: "Travel Locations",
-      onClick: () => setShowContact(true),
+       onClick: () => navigate("/user/placepage"),
     },
     {
       icon: <FaCog />,

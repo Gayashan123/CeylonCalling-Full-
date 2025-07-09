@@ -35,6 +35,7 @@ import SiteUserEmailVerificationPage from "./pages/UserEmailVerificationPage";
 import SiteUserForgotPasswordPage from "./pages/UserForgotPasswordPage";
 import SiteUserResetPasswordPage from "./pages/UserResetPasswordPage";
 import UserSettings from "./pages/UserSettings";
+import PlacesPage from "./pages/MyPlace";
  
 // Components
 import LoadingSpinner from "./shopowner/components/LoadingSpinner";
@@ -257,6 +258,16 @@ function App() {
           element={
             <SiteUserProtectedRoute>
               <UserProfile />
+            </SiteUserProtectedRoute>
+          }
+        />
+
+
+          <Route
+          path="/user/placepage"
+          element={
+            <SiteUserProtectedRoute>
+              <PlacesPage />
             </SiteUserProtectedRoute>
           }
         />

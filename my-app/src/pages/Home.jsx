@@ -1,13 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Navigation from "../components/NavigationPage";
-import SideNavbar from "../components/SideNavbar";
 import RestaurantCard from "../components/RestaurentCard";
-import { FaFilter } from "react-icons/fa";
 import SearchBar from "../components/SearchBar";
 import PriceFilter from "../components/FilterSection";
 import ShopTypeFilter from "../components/ShopTypeFilter";
+import { FaHome, FaUserCircle, FaStore, FaPlaneDeparture, FaCog } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
-import { motion, AnimatePresence } from "framer-motion";
+const iosColors = [
+  "from-[#ff9a9e] to-[#fad0c4]",
+  "from-[#a18cd1] to-[#fbc2eb]",
+  "from-[#fbc2eb] to-[#a6c1ee]",
+  "from-[#fad0c4] to-[#ffd1ff]",
+  "from-[#a1c4fd] to-[#c2e9fb]",
+];
 
 function Home() {
   const [allCategories, setAllCategories] = useState([]);
@@ -24,6 +31,18 @@ function Home() {
   const [shopTypeFilter, setShopTypeFilter] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState(null);
 
+  const navigate = useNavigate();
+  const scrollRef = useRef(null);
+
+  const navItems = [
+    { icon: <FaHome />, label: "Home", onClick: () => navigate("/") },
+    { icon: <FaUserCircle />, label: "Profile", onClick: () => navigate("/user/profile") },
+    { icon: <FaStore />, label: "Shops", onClick: () => navigate("/user/dashboard") },
+    { icon: <FaPlaneDeparture />, label: "Travel", onClick: () => navigate("/user/placepage") },
+    ,
+  ];
+
+  // Fetch categories
   useEffect(() => {
     setLoadingCategories(true);
     fetch("http://localhost:5000/api/categories/all")
@@ -35,6 +54,7 @@ function Home() {
       .catch(() => setLoadingCategories(false));
   }, []);
 
+  // Fetch shops and their categories
   useEffect(() => {
     let isMounted = true;
     async function fetchShopsAndCategories() {
@@ -87,25 +107,10 @@ function Home() {
       .catch(() => setLoadingFoods(false));
   };
 
-  const gradientColors = [
-    "from-pink-400 to-pink-600",
-    "from-purple-400 to-blue-400",
-    "from-yellow-400 to-orange-500",
-    "from-green-400 to-teal-500",
-    "from-cyan-400 to-blue-500",
-    "from-indigo-400 to-purple-500",
-    "from-red-400 to-pink-500",
-    "from-fuchsia-500 to-pink-500",
-    "from-emerald-400 to-green-500",
-    "from-sky-400 to-blue-500",
-  ];
-
   // === FILTER LOGIC ===
   const filteredShops = shops.filter((shop) => {
-    // 1. Shop Type Filter
     const matchType = shopTypeFilter === "all" || shop.shopType === shopTypeFilter;
 
-    // 2. Search Filter
     const searchLower = search.toLowerCase();
     const shopNameMatch = shop.name.toLowerCase().includes(searchLower);
     const categoryMatch = (shopCategories[shop._id] || []).some((cat) =>
@@ -113,164 +118,129 @@ function Home() {
     );
     const matchesSearch = !search || shopNameMatch || categoryMatch;
 
-    // 3. Category Filter
     const matchesCategory =
       !selectedCategory ||
       (shopCategories[shop._id] || []).some(
-        (cat) => cat.name === selectedCategory
+        (cat) => cat._id === selectedCategory || cat.name === selectedCategory
       );
 
-    // ✅ 4. Price Range Filter (NEW logic for "100 - 600" format)
     const priceRangeStr = shop.priceRange || "";
     const [minStr, maxStr] = priceRangeStr.split("-").map((s) => s.trim());
     const minPrice = parseInt(minStr, 10) || 0;
     const maxPrice = parseInt(maxStr, 10) || 0;
+    const matchesPrice = minPrice <= priceFilter.max && maxPrice >= priceFilter.min;
 
-   const matchesPrice =
-  minPrice <= priceFilter.max && maxPrice >= priceFilter.min;
-
-
-    // Final result:
     return matchType && matchesSearch && matchesCategory && matchesPrice;
   });
 
   return (
-    <div className="relative flex flex-col min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-white pb-24">
       <Navigation />
-      <main className="flex-grow pb-24 px-4 sm:px-8 max-w-screen-xl mx-auto">
-        {/* Categories */}
-        <section className="mt-10">
-          <div className="flex flex-col sm:flex-row sm:justify-between mt-20 items-start sm:items-end mb-4">
-            <h2 className="text-3xl font-bold text-gray-800">
-              Explore Categories
-            </h2>
-            <p className="text-sm text-gray-500 mt-1 sm:mt-0">
-              Find your favorite food by category!
-            </p>
-          </div>
-          {loadingCategories ? (
-            <div className="flex justify-center py-10">
-              <div className="h-8 w-8 animate-spin border-4 border-blue-500 border-t-transparent rounded-full"></div>
-            </div>
-          ) : (
-            <motion.div
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3"
-              initial="hidden"
-              animate="visible"
-              variants={{
-                hidden: {},
-                visible: {
-                  transition: {
-                    staggerChildren: 0.05,
-                  },
-                },
-              }}
-            >
-              {/* "All" Button */}
-              <motion.div
-                onClick={() => setSelectedCategory(null)}
-                className={`cursor-pointer px-4 py-2 rounded-full font-semibold shadow-md transition select-none
-    ${
-      selectedCategory === null
-        ? "bg-black text-white scale-105"
-        : "bg-gray-300 text-gray-800 hover:bg-gray-400"
-    }`}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0 }}
+
+      {/* Nav Icons */}
+      <div className="w-full fixed top-0 z-10 mt-14 bg-white py-4 border-b border-gray-200 mb-6">
+        <div className="max-w-screen-lg mx-auto px-4">
+          <div
+            className="flex sm:justify-between overflow-x-auto no-scrollbar gap-8"
+            ref={scrollRef}
+          >
+            {navItems.map((item, idx) => (
+              <motion.button
+                key={idx}
+                onClick={item.onClick}
+                whileTap={{ scale: 0.9 }}
+                className="flex flex-col items-center flex-shrink-0"
+                aria-label={item.label}
               >
-                All
-              </motion.div>
+                <div className="bg-gradient-to-tr from-pink-400 to-yellow-300 p-[3px] rounded-full">
+                  <div className="bg-white p-3 rounded-full shadow hover:shadow-md transition">
+                    <span className="text-pink-500 text-xl">{item.icon}</span>
+                  </div>
+                </div>
+                <span className="mt-1 text-xs font-semibold text-gray-600">
+                  {item.label}
+                </span>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </div>
 
-              {/* Other categories */}
-              {allCategories.map((cat, i) => {
-                const isSelected = selectedCategory === cat.name;
-                return (
-                  <motion.div
-                    key={cat._id}
-                    onClick={() =>
-                      setSelectedCategory(isSelected ? null : cat.name)
-                    }
-                    className={`cursor-pointer px-4 py-2 rounded-full font-semibold shadow-md transition select-none
-        ${
-          isSelected
-            ? "bg-black text-white scale-105"
-            : `bg-gradient-to-r ${
-                gradientColors[i % gradientColors.length]
-              } text-white`
-        }`}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: (i + 1) * 0.04 }} // +1 for "All"
-                  >
-                    {cat.name}
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-          )}
-        </section>
-
-        <hr className="my-10 border-0 h-1 bg-gradient-to-r from-fuchsia-500 via-indigo-400 to-cyan-400 rounded-full shadow-xl opacity-70" />
+      <main className="max-w-screen-lg mt-20 mx-auto px-4 sm:px-6 lg:px-8 pt-24">
+        {/* Categories */}
+        <nav className="flex items-center  overflow-x-auto space-x-4 mb-6 no-scrollbar py-2">
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className={`whitespace-nowrap px-5 py-2 rounded-full font-semibold transition ${
+              selectedCategory === null
+                ? "bg-pink-500 text-white shadow-lg scale-105"
+                : "bg-pink-100 text-pink-600 hover:bg-pink-200"
+            }`}
+          >
+            All
+          </button>
+          {allCategories.map((cat, idx) => {
+            const isSelected = selectedCategory === cat._id || selectedCategory === cat.name;
+            return (
+              <button
+                key={cat._id}
+                onClick={() => setSelectedCategory(isSelected ? null : cat._id || cat.name)}
+                className={`whitespace-nowrap px-5 py-2 rounded-full font-semibold transition bg-gradient-to-r ${
+                  isSelected
+                    ? "from-pink-500 to-pink-700 text-white shadow-lg scale-105"
+                    : `${iosColors[idx % iosColors.length]} text-white hover:brightness-110`
+                }`}
+              >
+                {cat.name}
+              </button>
+            );
+          })}
+        </nav>
 
         {/* Shop Type Filter */}
         <ShopTypeFilter value={shopTypeFilter} onChange={setShopTypeFilter} />
 
         {/* Price Filter */}
-        <PriceFilter
-          min={0}
-          max={5000}
-          value={priceFilter}
-          onChange={setPriceFilter}
-        />
-
-        <hr className="my-8 border-0 h-1 bg-gradient-to-r from-pink-400 via-blue-400 to-green-400 rounded shadow-lg" />
+        <PriceFilter min={0} max={5000} value={priceFilter} onChange={setPriceFilter} />
 
         {/* Search Bar */}
-        <SearchBar value={search} onChange={setSearch} onSubmit={() => {}} />
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          onSubmit={() => {}}
+          className="mb-6 bg-white rounded-full border border-gray-300 shadow-sm px-5 py-3 placeholder-pink-300 focus-within:border-pink-500 focus-within:ring-pink-300 transition"
+          placeholder="Search for shops..."
+        />
 
-        {/* Shops Section */}
-        <section>
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-  {shopTypeFilter === "all"
-    ? "All Shops"
-    : `${shopTypeFilter.charAt(0).toUpperCase()}${shopTypeFilter.slice(1)} `}
-</h2>
-
-
-          {loadingShops ? (
-            <p>Loading shops...</p>
-          ) : filteredShops.length === 0 ? (
-            <p className="text-gray-600 italic">
-              No shops found matching your filters.
-            </p>
-          ) : (
-            <motion.div
-              className="flex flex-col gap-6"
-              initial="hidden"
-              animate="visible"
-              variants={{
-                hidden: {},
-                visible: { transition: { staggerChildren: 0.07 } },
-              }}
-            >
-              {filteredShops.map((shop, idx) => (
-                <motion.div
-                  key={shop._id}
-                  initial={{ opacity: 0, scale: 0.97, y: 24 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.12 + idx * 0.06 }}
-                >
-                  <RestaurantCard
-                    shop={shop}
-                    categories={shopCategories[shop._id] || []}
-                    onViewMenu={handleViewFoods}
-                  />
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
-        </section>
+        {/* Shops Grid */}
+        {loadingShops ? (
+          <p>Loading shops...</p>
+        ) : filteredShops.length === 0 ? (
+          <p className="text-gray-600 italic">No shops found matching your filters.</p>
+        ) : (
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            initial="hidden"
+            animate="visible"
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
+          >
+            {filteredShops.map((shop, idx) => (
+              <motion.div
+                key={shop._id}
+                initial={{ opacity: 0, scale: 0.97, y: 24 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.12 + idx * 0.06 }}
+              >
+                <RestaurantCard
+                  shop={shop}
+                  categories={shopCategories[shop._id] || []}
+                  onViewMenu={handleViewFoods}
+                  className="rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition cursor-pointer"
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </main>
 
       {/* Foods Modal */}
@@ -283,7 +253,7 @@ function Home() {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white rounded-xl shadow-xl max-w-3xl w-full p-6 relative"
+              className="bg-white rounded-3xl shadow-xl max-w-3xl w-full p-6 relative"
               initial={{ scale: 0.92, y: 60, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.92, y: 60, opacity: 0 }}
@@ -299,9 +269,7 @@ function Home() {
               >
                 &times;
               </button>
-              <h3 className="text-xl font-semibold mb-4">
-                Foods at {selectedShop.name}
-              </h3>
+              <h3 className="text-xl font-semibold mb-4">Foods at {selectedShop.name}</h3>
               {loadingFoods ? (
                 <p>Loading foods...</p>
               ) : (
@@ -331,9 +299,7 @@ function Home() {
                       )}
                       <div>
                         <div className="font-semibold">{food.name}</div>
-                        <div className="text-gray-600 text-sm">
-                          ${food.price.toFixed(2)}
-                        </div>
+                        <div className="text-gray-600 text-sm">${food.price.toFixed(2)}</div>
                       </div>
                     </motion.div>
                   ))}
@@ -343,8 +309,6 @@ function Home() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <SideNavbar />
     </div>
   );
 }

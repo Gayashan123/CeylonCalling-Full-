@@ -1,6 +1,6 @@
 import { FiSearch } from "react-icons/fi";
 
-function SearchBar({ value, onChange, onSubmit, placeholder = "Search shops...." }) {
+function SearchBar({ value, onChange, onSubmit, placeholder = "Search......" }) {
   return (
     <form
       onSubmit={e => {
