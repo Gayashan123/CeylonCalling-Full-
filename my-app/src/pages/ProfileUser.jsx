@@ -16,17 +16,13 @@ import {
 } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import TopNavigation from "../components/TopNavigation";
-
-
 import SearchBar from "../components/SearchBar";
 import AddPlace from "../components/AddPlace";
 import AddCategory from "../components/AddLocationCategory";
 import PlaceEdit from "../components/PlaceEdit";
-import Navbar from "../components/SideNavbar"
+import PlaceInsightsCard from "../components/PlaceInsightCard";
 import axios from "axios";
-import Contact from "../components/Contact"
-import UserGuide from "../components/UserGuide";
-import Help from "../components/Help";
+
 const iosColors = [
   "bg-gradient-to-r from-[#ff9a9e] to-[#fad0c4]",
   "bg-gradient-to-r from-[#a18cd1] to-[#fbc2eb]",
@@ -58,13 +54,7 @@ export default function ProfileUserPage() {
   const [showAddPlaceModal, setShowAddPlaceModal] = useState(false);
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
 
-  const navItems = [
-    { icon: <FaHome />, label: "Home", onClick: () => navigate("/") },
-    { icon: <FaUserCircle />, label: "Profile", onClick: () => {} },
-    { icon: <FaStore />, label: "Shops", onClick: () => navigate("/user/dashboard") },
-    { icon: <FaPlaneDeparture />, label: "Places", onClick: () => navigate("/user/placepage") },
-    
-  ];
+  const [openInsightsId, setOpenInsightsId] = useState(null); // New state for insights modal
 
   useEffect(() => {
     const fetchData = async () => {
@@ -108,29 +98,31 @@ export default function ProfileUserPage() {
   };
 
   const filteredPlaces = places.filter((place) => {
-    const matchSearch = place.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                       place.location?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchCategory = !selectedCategory || 
-                         place.categories?.includes(selectedCategory) || 
-                         place.categories?.some(cat => cat._id === selectedCategory || cat.name === selectedCategory);
+    const matchSearch =
+      place.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      place.location?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchCategory =
+      !selectedCategory ||
+      place.categories?.includes(selectedCategory) ||
+      place.categories?.some(
+        (cat) => cat._id === selectedCategory || cat.name === selectedCategory
+      );
+
     return matchSearch && matchCategory;
   });
 
   return (
     <div className="min-h-screen bg-gray-50 pb-30">
       {/* Top Navigation */}
-     <TopNavigation
-  setShowAddPlaceModal={setShowAddPlaceModal}
-  setShowAddCategoryModal={setShowAddCategoryModal}
-  showAddMenu={showAddMenu}
-  setShowAddMenu={setShowAddMenu}
-/>
+      <TopNavigation
+        setShowAddPlaceModal={setShowAddPlaceModal}
+        setShowAddCategoryModal={setShowAddCategoryModal}
+        showAddMenu={showAddMenu}
+        setShowAddMenu={setShowAddMenu}
+      />
 
-      {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Profile Header */}
-        
-
         {/* Category Filter */}
         <div className="mb-6">
           <div className="flex flex-wrap gap-2">
@@ -147,11 +139,17 @@ export default function ProfileUserPage() {
             {categories.map((category, index) => (
               <div key={category._id} className="relative group">
                 <button
-                  onClick={() => setSelectedCategory(selectedCategory === category._id ? null : category._id)}
+                  onClick={() =>
+                    setSelectedCategory(
+                      selectedCategory === category._id ? null : category._id
+                    )
+                  }
                   className={`px-4 py-2 rounded-full text-sm font-medium text-white shadow-sm transition ${
                     iosColors[index % iosColors.length]
                   } ${
-                    selectedCategory === category._id ? "ring-2 ring-purple-500 ring-offset-2" : ""
+                    selectedCategory === category._id
+                      ? "ring-2 ring-purple-500 ring-offset-2"
+                      : ""
                   }`}
                 >
                   {category.name}
@@ -186,8 +184,8 @@ export default function ProfileUserPage() {
         ) : filteredPlaces.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500">
-              {searchTerm || selectedCategory 
-                ? "No places match your search criteria" 
+              {searchTerm || selectedCategory
+                ? "No places match your search criteria"
                 : "You haven't added any places yet"}
             </p>
             <button
@@ -226,9 +224,9 @@ export default function ProfileUserPage() {
                     <div className="flex justify-between items-center">
                       <div className="flex flex-wrap gap-1">
                         {place.categories?.slice(0, 2).map((catId, idx) => {
-                          const category = categories.find(c => c._id === catId);
+                          const category = categories.find((c) => c._id === catId);
                           return category ? (
-                            <span 
+                            <span
                               key={catId}
                               className={`text-xs px-2 py-1 rounded-full text-white ${iosColors[idx % iosColors.length]}`}
                             >
@@ -257,6 +255,13 @@ export default function ProfileUserPage() {
                         >
                           <FaTrash />
                         </button>
+                        <button
+                          onClick={() => setOpenInsightsId(place._id)}
+                          className="text-blue-500 hover:text-blue-700 p-2"
+                          title="View Insights"
+                        >
+                          📊
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -270,100 +275,55 @@ export default function ProfileUserPage() {
       {/* Modals */}
       <AnimatePresence>
         {showAddPlaceModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-transparent bg-opacity-50 z-50 flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto"
-            >
-              <div className="flex justify-between items-center border-b p-4">
-                <h3 className="text-lg font-bold text-gray-800">Add New Place</h3>
-                <button
-                  onClick={() => setShowAddPlaceModal(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <IoMdClose size={24} />
-                </button>
+          <motion.div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div className="bg-white rounded-xl w-full max-w-md p-4 overflow-y-auto max-h-[90vh]"
+              initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}>
+              <div className="flex justify-between items-center border-b pb-2">
+                <h3 className="text-lg font-bold">Add New Place</h3>
+                <button onClick={() => setShowAddPlaceModal(false)}><IoMdClose size={24} /></button>
               </div>
-              <AddPlace 
-                onClose={() => setShowAddPlaceModal(false)} 
-                onPlaceAdded={(newPlace) => {
-                  setPlaces(prev => [...prev, newPlace]);
-                  setShowAddPlaceModal(false);
-                }}
-              />
+              <AddPlace onClose={() => setShowAddPlaceModal(false)} onPlaceAdded={(newPlace) => {
+                setPlaces((prev) => [...prev, newPlace]);
+                setShowAddPlaceModal(false);
+              }} />
             </motion.div>
           </motion.div>
         )}
 
         {showAddCategoryModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-transparent bg-opacity-50 z-50 flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-white rounded-xl shadow-xl w-full max-w-md"
-            >
-              <div className="flex justify-between items-center border-b p-4">
-                <h3 className="text-lg font-bold text-gray-800">Add New Category</h3>
-                <button
-                  onClick={() => setShowAddCategoryModal(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <IoMdClose size={24} />
-                </button>
+          <motion.div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div className="bg-white rounded-xl w-full max-w-md p-4"
+              initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}>
+              <div className="flex justify-between items-center border-b pb-2">
+                <h3 className="text-lg font-bold">Add New Category</h3>
+                <button onClick={() => setShowAddCategoryModal(false)}><IoMdClose size={24} /></button>
               </div>
-              <AddCategory 
-                onClose={() => setShowAddCategoryModal(false)} 
-                onCategoryAdded={(newCategory) => {
-                  setCategories(prev => [...prev, newCategory]);
-                  setShowAddCategoryModal(false);
-                }}
-              />
+              <AddCategory onClose={() => setShowAddCategoryModal(false)} onCategoryAdded={(newCat) => {
+                setCategories((prev) => [...prev, newCat]);
+                setShowAddCategoryModal(false);
+              }} />
             </motion.div>
           </motion.div>
         )}
 
         {editingPlace && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-transparent bg-opacity-50 z-50 flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto"
-            >
-              <div className="flex justify-between items-center border-b p-4">
-                <h3 className="text-lg font-bold text-gray-800">Edit Place</h3>
-                <button
-                  onClick={() => setEditingPlace(null)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <IoMdClose size={24} />
-                </button>
+          <motion.div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div className="bg-white rounded-xl w-full max-w-md p-4 overflow-y-auto max-h-[90vh]"
+              initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}>
+              <div className="flex justify-between items-center border-b pb-2">
+                <h3 className="text-lg font-bold">Edit Place</h3>
+                <button onClick={() => setEditingPlace(null)}><IoMdClose size={24} /></button>
               </div>
               <PlaceEdit
                 place={editingPlace}
                 categories={categories}
                 onClose={() => setEditingPlace(null)}
                 onPlaceUpdated={(updatedPlace) => {
-                  setPlaces(prev => 
-                    prev.map(p => p._id === updatedPlace._id ? updatedPlace : p)
+                  setPlaces((prev) =>
+                    prev.map((p) => (p._id === updatedPlace._id ? updatedPlace : p))
                   );
                   setEditingPlace(null);
                 }}
@@ -372,11 +332,22 @@ export default function ProfileUserPage() {
           </motion.div>
         )}
 
-       
+        {openInsightsId && (
+          <motion.div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div className="bg-white max-w-2xl w-full rounded-xl p-6 shadow-xl relative"
+              initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}>
+              <button onClick={() => setOpenInsightsId(null)} className="absolute top-2 right-2 text-gray-500 hover:text-red-500">
+                <IoMdClose size={24} />
+              </button>
+              <PlaceInsightsCard
+                place={places.find(p => p._id === openInsightsId)}
+                categories={categories}
+              />
+            </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
-
-
-
     </div>
   );
 }
