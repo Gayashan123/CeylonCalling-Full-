@@ -18,7 +18,7 @@ const placeSchema = new mongoose.Schema({
     trim: true
   },
   images: [{
-    type: String, // URLs from Cloudinary or local storage
+    type: String,
   }],
   user: { 
     type: mongoose.Schema.Types.ObjectId, 
@@ -29,6 +29,14 @@ const placeSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "PlaceCategory"
   }],
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "SiteUser"
+  }],
+  likeCount: {
+    type: Number,
+    default: 0
+  },
   createdAt: { 
     type: Date, 
     default: Date.now 
@@ -37,5 +45,8 @@ const placeSchema = new mongoose.Schema({
   toJSON: { virtuals: true },
   toObject: { virtuals: true } 
 });
+
+// Add index for better performance on likes queries
+placeSchema.index({ likes: 1 });
 
 export default mongoose.model("Place", placeSchema);

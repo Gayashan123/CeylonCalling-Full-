@@ -1,22 +1,43 @@
 import { FaHeart, FaRegHeart, FaMapMarkerAlt, FaDirections, FaInfoCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState } from "react";
+import axios from "axios";
 
-function PlaceCard({ place, categories = [] }) {
+function PlaceCard({ place, categories = [], currentUserId }) {
   const navigate = useNavigate();
   const mainImage = place.images?.length > 0 ? place.images[0] : "/default-place.jpg";
 
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(place.likeCount || 0);
+  // Check if current user has liked this place
+  const alreadyLiked =
+    currentUserId && Array.isArray(place.likes)
+      ? place.likes.some((id) =>
+          typeof id === "object" && id._id
+            ? id._id === currentUserId
+            : id === currentUserId
+        )
+      : false;
 
-  const handleLike = () => {
-    if (liked) {
-      setLikeCount(likeCount - 1);
-    } else {
-      setLikeCount(likeCount + 1);
+  const [liked, setLiked] = useState(alreadyLiked);
+  const [likeCount, setLikeCount] = useState(place.likeCount || 0);
+  const [likeLoading, setLikeLoading] = useState(false);
+
+  const handleLike = async () => {
+    if (!currentUserId) {
+      navigate("/login");
+      return;
     }
-    setLiked(!liked);
+    if (likeLoading) return;
+    setLikeLoading(true);
+    try {
+      const res = await axios.post(`/api/place/${place._id}/like`, {}, { withCredentials: true });
+      setLiked(res.data.data.liked);
+      setLikeCount(res.data.data.likeCount);
+    } catch (e) {
+      // Optional: error handling (toast etc)
+    } finally {
+      setLikeLoading(false);
+    }
   };
 
   return (
@@ -58,15 +79,11 @@ function PlaceCard({ place, categories = [] }) {
           loading="lazy"
           decoding="async"
         />
-        {/* Gradient overlay on hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-50 transition-opacity duration-300 rounded-b-3xl"></div>
       </div>
 
-      {/* Description */}
       <div className="p-4 space-y-3">
         <p className="text-gray-700 text-sm line-clamp-3">{place.description || "No description available."}</p>
-
-        {/* Categories */}
         <div className="flex flex-wrap gap-2">
           {categories.length > 0 ? (
             categories.map((cat) => (
@@ -86,14 +103,16 @@ function PlaceCard({ place, categories = [] }) {
         </div>
       </div>
 
-      {/* Actions */}
       <footer className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
         {/* Like Button */}
         <button
           onClick={handleLike}
           aria-pressed={liked}
           aria-label="Like place"
-          className="flex items-center gap-2 text-pink-500 hover:text-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-300 rounded transition"
+          className={`flex items-center gap-2 text-pink-500 hover:text-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-300 rounded transition ${
+            likeLoading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={likeLoading}
         >
           <motion.span
             animate={{ scale: liked ? [1, 1.3, 1] : 1 }}

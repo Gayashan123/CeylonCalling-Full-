@@ -216,6 +216,95 @@ router.delete("/:id", sessionAuth, async (req, res) => {
       error: error.message 
     });
   }
+
 });
+
+// ... (previous imports and setup)
+
+/// Like a place - Updated version
+router.post("/:id/like", sessionAuth, async (req, res) => {
+  try {
+    const place = await Place.findById(req.params.id);
+    if (!place) {
+      return res.status(404).json({ 
+        success: false,
+        error: "Place not found" 
+      });
+    }
+
+    const userId = req.session.siteuserId;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: "Not authenticated"
+      });
+    }
+
+    const likeIndex = place.likes.findIndex(id => id.equals(userId));
+
+    if (likeIndex === -1) {
+      // Add like
+      place.likes.push(userId);
+      place.likeCount += 1;
+    } else {
+      // Remove like
+      place.likes.pull(userId);
+      place.likeCount = Math.max(0, place.likeCount - 1);
+    }
+
+    await place.save();
+
+    res.json({ 
+      success: true,
+      data: {
+        liked: likeIndex === -1,
+        likeCount: place.likeCount,
+        likes: place.likes // Return updated likes array
+      }
+    });
+  } catch (error) {
+    console.error("Like error:", error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+});
+
+// Get likes for a place - Updated version
+router.get("/:id/likes", async (req, res) => {
+  try {
+    const place = await Place.findById(req.params.id)
+      .populate({
+        path: "likes",
+        select: "username profilePicture",
+        options: { limit: 20 } // Limit for performance
+      })
+      .select("likes likeCount");
+
+    if (!place) {
+      return res.status(404).json({ 
+        success: false,
+        error: "Place not found" 
+      });
+    }
+
+    res.json({ 
+      success: true,
+      data: {
+        likes: place.likes,
+        likeCount: place.likeCount
+      }
+    });
+  } catch (error) {
+    console.error("Get likes error:", error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+});
+
+
 
 export default router;

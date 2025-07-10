@@ -204,23 +204,22 @@ function PlacesPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <PlaceCard
-                        place={place}
-                        categories={
-                          Array.isArray(place.categories)
-                            ? place.categories
-                                .filter(cat => typeof cat === "object" && cat?.name)
-                                .map(cat => ({
-                                  ...cat,
-                                  color: categoryColors[
-                                    categories.findIndex(c => c._id === cat._id) % categoryColors.length
-                                  ]
-                                }))
-                            : []
-                        }
-                        className="h-full bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition"
-                        imageClassName="w-full h-48 object-cover"
-                      />
+                     <PlaceCard
+  place={place}
+  categories={
+    Array.isArray(place.categories)
+      ? place.categories
+          .filter(cat => typeof cat === "object" && cat?.name)
+          .map(cat => ({
+            ...cat,
+            color: categoryColors[
+              categories.findIndex(c => c._id === cat._id) % categoryColors.length
+            ]
+          }))
+      : []
+  }
+  currentUserId={user?._id} // <<<< Pass the current user id
+/>
                     </motion.div>
                   ))}
                 </AnimatePresence>
