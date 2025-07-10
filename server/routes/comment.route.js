@@ -2,6 +2,7 @@ import express from "express";
 import Comment from "../models/comment.model.js";
 import Shop from "../models/Shop.js";
 import { sessionAuth } from "../middlewares/siteUserAuth.js";
+import { sessionAuth as userAuth } from "../middlewares/sessionAuth.js";
 const router = express.Router();
 
 // PUBLIC: Get all comments for a specific shop
@@ -55,19 +56,32 @@ router.post("/", sessionAuth, async (req, res) => {
   }
 });
 
-// PRIVATE: Delete a comment made by the current user
-router.delete("/:id", sessionAuth, async (req, res) => {
+// PRIVATE: Delete a comment only for the shop 
+// PRIVATE: Only shop owners can delete comments on their shops
+router.delete("/:id", userAuth, async (req, res) => {
   try {
-    const comment = await Comment.findOneAndDelete({
-      _id: req.params.id,
-      user: req.session.siteuserId,
-    });
+    const comment = await Comment.findById(req.params.id).populate("shop");
 
     if (!comment) return res.status(404).json({ error: "Comment not found." });
-    res.json({ message: "Comment deleted." });
+
+    const shop = comment.shop;
+
+    // Check if the current logged-in user is the owner of the shop
+    if (String(shop.owner) !== String(req.session.userId)) {
+      return res.status(403).json({ error: "Unauthorized to delete this comment." });
+    }
+
+    await Comment.findByIdAndDelete(comment._id);
+
+    res.json({ message: "Comment deleted successfully." });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
+
+// PRIVATE: Delete a comment made by the current user
+
+
 
 export default router;

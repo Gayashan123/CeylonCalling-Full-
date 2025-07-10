@@ -209,7 +209,7 @@ function RestaurantCard({ shop, categories = [], currentUserId, onViewMenu }) {
         {/* View Menu Button */}
         <button
           type="button"
-          onClick={() => onViewMenu(shop)}
+          onClick={() => navigate(`/foodpage/${shop._id}`)} 
           className="flex items-center gap-1 text-gray-700 hover:text-blue-600 transition"
         >
           <FaUtensils className="text-lg text-blue-500" />

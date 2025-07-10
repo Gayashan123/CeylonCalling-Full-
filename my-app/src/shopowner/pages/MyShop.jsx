@@ -5,7 +5,8 @@ import Navigation from "../../shopowner/components/SideNavbar";
 import { motion, AnimatePresence } from "framer-motion";
 import EditFood from "../components/EditFood";
 import ShopEditModal from "../components/ShopEdit";
-import ShopComments from "../components/CommentShow"
+import ShopStats from "../components/ShopState";
+
 
 
 const getDisplayImage = (photo) => {
@@ -333,7 +334,8 @@ const MyShop = () => {
       </div>
 
 
-<ShopComments shopId={shop._id} />
+<ShopStats shopId={shop._id} isShopOwner={true} />
+
     </div>
   );
 };
