@@ -36,6 +36,7 @@ import SiteUserForgotPasswordPage from "./pages/UserForgotPasswordPage";
 import SiteUserResetPasswordPage from "./pages/UserResetPasswordPage";
 import UserSettings from "./pages/UserSettings";
 import PlacesPage from "./pages/MyPlace";
+import PlaceDetails from "./pages/PlaceDetails";
  
 // Components
 import LoadingSpinner from "./shopowner/components/LoadingSpinner";
@@ -131,6 +132,8 @@ function App() {
 
         {/* Food listing (public) */}
         <Route path="/foodpage/:shopId" element={<FoodList />} />
+        // In your router configuration
+        <Route path="/places/:id" element={<PlaceDetails />} />      
 
         {/* ----------- SHOPOWNER ROUTES ----------- */}
         <Route path="/shop" element={<Shop />} />
@@ -271,6 +274,19 @@ function App() {
             </SiteUserProtectedRoute>
           }
         />
+
+
+          <Route
+          path="/user/placdetails"
+          element={
+            <SiteUserProtectedRoute>
+              <PlaceDetails />
+            </SiteUserProtectedRoute>
+          }
+        />
+
+
+
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
