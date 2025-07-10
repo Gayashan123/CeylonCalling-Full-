@@ -1,28 +1,21 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import PlaceCard from "../components/PlaceCard";
-import {
-  FaUserCircle,
-  FaStore,
-  FaCog,
-  FaPlaneDeparture,
-  FaHome,
-} from "react-icons/fa";
+import Sidenav from "../components/SideNavbar";
 import axios from "axios";
 import Navigation from "../components/NavigationPage";
 import SearchBar from "../components/SearchBar";
 import { useSiteUserAuthStore } from "../store/siteUserAuthStore";
 import { useNavigate } from "react-router-dom";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
-const iosColors = [
-  "from-[#ff9a9e] to-[#fad0c4]",
-  "from-[#a18cd1] to-[#fbc2eb]",
-  "from-[#fbc2eb] to-[#a6c1ee]",
-  "from-[#fad0c4] to-[#ffd1ff]",
-  "from-[#a1c4fd] to-[#c2e9fb]",
+const categoryColors = [
+  "bg-gradient-to-r from-[#FF9A8B] to-[#FF6B95]",
+  "bg-gradient-to-r from-[#667EEA] to-[#764BA2]",
+  "bg-gradient-to-r from-[#FFD700] to-[#FFA500]",
+  "bg-gradient-to-r from-[#4FACFE] to-[#00F2FE]",
+  "bg-gradient-to-r from-[#6A11CB] to-[#2575FC]",
 ];
-
-// ... [imports remain unchanged]
 
 function PlacesPage() {
   const [places, setPlaces] = useState([]);
@@ -35,14 +28,6 @@ function PlacesPage() {
   const user = useSiteUserAuthStore((state) => state.user);
   const navigate = useNavigate();
   const scrollRef = useRef(null);
-
-  const navItems = [
-    { icon: <FaHome />, label: "Home", onClick: () => navigate("/") },
-    { icon: <FaUserCircle />, label: "Profile", onClick: () => navigate("/user/profile") },
-    { icon: <FaStore />, label: "Shops", onClick: () => navigate("/user/dashboard") },
-    { icon: <FaPlaneDeparture />, label: "Travel", onClick: () => navigate("/user/placepage") },
-   
-  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,6 +54,7 @@ function PlacesPage() {
       place.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       place.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       place.location?.toLowerCase().includes(searchTerm.toLowerCase());
+    
     const matchesCategory =
       !selectedCategory ||
       (Array.isArray(place.categories) &&
@@ -77,127 +63,171 @@ function PlacesPage() {
             (typeof cat === "string" && cat === selectedCategory) ||
             (typeof cat === "object" && cat._id === selectedCategory)
         ));
+    
     return matchesSearch && matchesCategory;
   });
 
   return (
-    <div className="min-h-screen  bg- pb-24 transition-colors duration-300">
+    <div className="min-h-screen bg-gray-50">
       <Navigation />
+      <Sidenav />
 
-      {/* Nav Icons */}
-      <div className="w-full mt-13 fixed top-0 z-10 bg-white py-4 border-b border-gray-200 mb-6">
-        <div className="max-w-screen-lg mx-auto px-4">
-          <div className="flex sm:justify-between overflow-x-auto no-scrollbar gap-10">
-            {navItems.map((item, idx) => (
-              <motion.button
-                key={idx}
-                onClick={item.onClick}
-                whileTap={{ scale: 0.9 }}
-                className="flex flex-col items-center flex-shrink-0"
-              >
-                <div className="bg-gradient-to-tr from-pink-400 to-yellow-300 p-[3px] rounded-full">
-                  <div className="bg-white p-3 rounded-full shadow hover:shadow-md transition">
-                    <span className="text-pink-500 text-xl">{item.icon}</span>
-                  </div>
-                </div>
-                <span className="mt-1 text-xs font-semibold text-gray-600">{item.label}</span>
-              </motion.button>
-            ))}
+      <main className="max-w-7xl mx-auto px-4 mt-39 sm:px-6 lg:px-8 py-6">
+        {/* Header Section */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <img
+                src={
+                  user?.photo ||
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "User")}&background=ff9a9e&color=fff`
+                }
+                alt="User"
+                className="w-16 h-16 rounded-full border-4 border-white shadow-lg object-cover"
+              />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Discover Places</h1>
+              <div className="flex items-center text-gray-600 mt-1">
+                <FaMapMarkerAlt className="mr-2 text-pink-500" />
+                <span>Colombo, Sri Lanka</span>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Header */}
-      <main className="max-w-screen-lg mx-auto px-4 sm:px-6 lg:px-8">
-        <header className="flex items-center gap-5 mb-10">
-          <img
-            src={
-              user?.photo ||
-              `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "User")}&background=ff9a9e&color=fff`
-            }
-            alt="User"
-            className="w-16 h-16 rounded-full border-4 border-pink-400 shadow-lg object-cover"
-          />
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#1c1c1e]">
-              📍 Colombo, Sri Lanka
-            </h1>
-            <p className="text-sm text-pink-500 italic">Find the most loved places here</p>
+          {/* Search Bar */}
+          <div className="w-full md:w-auto">
+            <SearchBar
+              value={searchTerm}
+              onChange={setSearchTerm}
+              placeholder="Search places..."
+              className="bg-white border border-gray-200 rounded-full px-5 py-3 shadow-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+            />
           </div>
         </header>
 
-        {/* Categories */}
-        <nav ref={scrollRef} className="flex items-center mt-30 overflow-x-auto space-x-4 mb-6 no-scrollbar py-2">
-          <button
-            onClick={() => setSelectedCategory(null)}
-            className={`whitespace-nowrap px-5 py-2 rounded-full font-semibold transition ${
-              selectedCategory === null
-                ? "bg-pink-500 text-white shadow-lg scale-105"
-                : "bg-pink-100 text-pink-600 hover:bg-pink-200"
-            }`}
+        {/* Categories Filter */}
+        <section className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Categories</h2>
+          <div 
+            ref={scrollRef} 
+            className="flex items-center gap-3 overflow-x-auto pb-2 no-scrollbar"
           >
-            All
-          </button>
-          {categories.map((cat, idx) => {
-            const isSelected = selectedCategory === cat._id;
-            return (
-              <button
-                key={cat._id}
-                onClick={() => setSelectedCategory(isSelected ? null : cat._id)}
-                className={`whitespace-nowrap px-5 py-2 rounded-full font-semibold transition bg-gradient-to-r ${
-                  isSelected
-                    ? "from-pink-500 to-pink-700 text-white shadow-lg scale-105"
-                    : `${iosColors[idx % iosColors.length]} text-white hover:brightness-110`
-                }`}
-              >
-                {cat.name}
-              </button>
-            );
-          })}
-        </nav>
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition ${
+                selectedCategory === null
+                  ? "bg-pink-600 text-white shadow-md"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              All Places
+            </button>
+            
+            {categories.map((cat, idx) => {
+              const isSelected = selectedCategory === cat._id;
+              return (
+                <button
+                  key={cat._id}
+                  onClick={() => setSelectedCategory(isSelected ? null : cat._id)}
+                  className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium text-white transition ${
+                    categoryColors[idx % categoryColors.length]
+                  } ${isSelected ? "ring-2 ring-white ring-offset-2" : ""}`}
+                >
+                  {cat.name}
+                </button>
+              );
+            })}
+          </div>
+        </section>
 
-        {/* Search */}
-        <SearchBar
-          value={searchTerm}
-          onChange={setSearchTerm}
-          onSubmit={() => {}}
-          className="mb-6 bg-white rounded-full border border-gray-300 shadow-sm px-5 py-3 placeholder-pink-300 focus-within:border-pink-500 focus-within:ring-pink-300 transition"
-          placeholder="Search for a place..."
-        />
+        {/* Main Content */}
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
+          </div>
+        ) : error ? (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-gray-800">
+                {selectedCategory 
+                  ? `${categories.find(c => c._id === selectedCategory)?.name || ''} Places` 
+                  : "All Places"}
+              </h3>
+              <span className="text-sm text-gray-500">
+                {filteredPlaces.length} {filteredPlaces.length === 1 ? "place" : "places"} found
+              </span>
+            </div>
 
-      
-        
-
-        {/* Places Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <AnimatePresence>
             {filteredPlaces.length === 0 ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="col-span-full text-center py-12 text-gray-400"
-              >
-                {searchTerm ? "No places match your search." : "No places found."}
-              </motion.div>
+              <div className="bg-white rounded-xl shadow-sm p-8 text-center">
+                <svg
+                  className="mx-auto h-12 w-12 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <h3 className="mt-2 text-lg font-medium text-gray-900">No places found</h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  {searchTerm 
+                    ? "Try adjusting your search or filter to find what you're looking for."
+                    : "There are currently no places available in this category."}
+                </p>
+              </div>
             ) : (
-              filteredPlaces.map((place) => (
-                <PlaceCard
-                  key={place._id}
-                  place={place}
-                  categories={
-                    Array.isArray(place.categories)
-                      ? place.categories.filter(
-                          (cat) => typeof cat === "object" && cat !== null && cat.name
-                        )
-                      : []
-                  }
-                  className="rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition cursor-pointer"
-                  imageClassName="object-cover aspect-square rounded-3xl"
-                />
-              ))
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <AnimatePresence>
+                  {filteredPlaces.map((place) => (
+                    <motion.div
+                      key={place._id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <PlaceCard
+                        place={place}
+                        categories={
+                          Array.isArray(place.categories)
+                            ? place.categories
+                                .filter(cat => typeof cat === "object" && cat?.name)
+                                .map(cat => ({
+                                  ...cat,
+                                  color: categoryColors[
+                                    categories.findIndex(c => c._id === cat._id) % categoryColors.length
+                                  ]
+                                }))
+                            : []
+                        }
+                        className="h-full bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition"
+                        imageClassName="w-full h-48 object-cover"
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
             )}
-          </AnimatePresence>
-        </div>
+          </>
+        )}
       </main>
     </div>
   );

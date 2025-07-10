@@ -5,7 +5,7 @@ import RestaurantCard from "../components/RestaurentCard";
 import SearchBar from "../components/SearchBar";
 import PriceFilter from "../components/FilterSection";
 import ShopTypeFilter from "../components/ShopTypeFilter";
-import { FaHome, FaUserCircle, FaStore, FaPlaneDeparture, FaCog } from "react-icons/fa";
+import Sidenav from "../components/SideNavbar"
 import { useNavigate } from "react-router-dom";
 
 const iosColors = [
@@ -34,13 +34,7 @@ function Home() {
   const navigate = useNavigate();
   const scrollRef = useRef(null);
 
-  const navItems = [
-    { icon: <FaHome />, label: "Home", onClick: () => navigate("/") },
-    { icon: <FaUserCircle />, label: "Profile", onClick: () => navigate("/user/profile") },
-    { icon: <FaStore />, label: "Shops", onClick: () => navigate("/user/dashboard") },
-    { icon: <FaPlaneDeparture />, label: "Travel", onClick: () => navigate("/user/placepage") },
-    ,
-  ];
+ 
 
   // Fetch categories
   useEffect(() => {
@@ -137,37 +131,14 @@ function Home() {
     <div className="min-h-screen bg-white pb-24">
       <Navigation />
 
-      {/* Nav Icons */}
-      <div className="w-full fixed top-0 z-10 mt-14 bg-white py-4 border-b border-gray-200 mb-6">
-        <div className="max-w-screen-lg mx-auto px-4">
-          <div
-            className="flex sm:justify-between overflow-x-auto no-scrollbar gap-8"
-            ref={scrollRef}
-          >
-            {navItems.map((item, idx) => (
-              <motion.button
-                key={idx}
-                onClick={item.onClick}
-                whileTap={{ scale: 0.9 }}
-                className="flex flex-col items-center flex-shrink-0"
-                aria-label={item.label}
-              >
-                <div className="bg-gradient-to-tr from-pink-400 to-yellow-300 p-[3px] rounded-full">
-                  <div className="bg-white p-3 rounded-full shadow hover:shadow-md transition">
-                    <span className="text-pink-500 text-xl">{item.icon}</span>
-                  </div>
-                </div>
-                <span className="mt-1 text-xs font-semibold text-gray-600">
-                  {item.label}
-                </span>
-              </motion.button>
-            ))}
-          </div>
-        </div>
-      </div>
+     <Sidenav />
 
       <main className="max-w-screen-lg mt-20 mx-auto px-4 sm:px-6 lg:px-8 pt-24">
         {/* Categories */}
+       <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 tracking-tight">
+  Explore Categories
+</h2>
+
         <nav className="flex items-center  overflow-x-auto space-x-4 mb-6 no-scrollbar py-2">
           <button
             onClick={() => setSelectedCategory(null)}
@@ -196,12 +167,15 @@ function Home() {
             );
           })}
         </nav>
+        <hr className="my-6 border-t border-gray-100" />
+
 
         {/* Shop Type Filter */}
         <ShopTypeFilter value={shopTypeFilter} onChange={setShopTypeFilter} />
 
         {/* Price Filter */}
         <PriceFilter min={0} max={5000} value={priceFilter} onChange={setPriceFilter} />
+<hr className="my-6 border-t border-gray-100" />
 
         {/* Search Bar */}
         <SearchBar

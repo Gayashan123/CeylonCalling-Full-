@@ -1,91 +1,49 @@
+// components/NavItems.jsx
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { FaStore, FaCog,  FaUserCircle,FaPlaneDeparture} from "react-icons/fa";
-import ContactModal from "./ContactModel";
+import { motion } from "framer-motion";
+import {
+  FaUserCircle,
+  FaStore,
+  FaCog,
+  FaPlaneDeparture,
+  FaHome,
+} from "react-icons/fa";
 
-function Navbar() {
+function NavItems() {
   const navigate = useNavigate();
-  
-  const [showContact, setShowContact] = useState(false);
 
   const navItems = [
-     {
-      icon: < FaUserCircle />,
-      label: "Profile",
-      onClick: () => navigate("/user/profile"),
-    },
-    {
-     icon: <FaStore />,
-      label: "Shops",
-      onClick: () => navigate("/user/dashboard"),
-    },
-    {
-      icon: <FaPlaneDeparture />,
-      label: "Travel Locations",
-       onClick: () => navigate("/user/placepage"),
-    },
-    {
-      icon: <FaCog />,
-      label: "Settings",
-      onClick: () => navigate("/usersetting"),
-    },
+   
+    { icon: <FaUserCircle />, label: "Profile", path: "/user/profile" },
+    { icon: <FaStore />, label: "Shops", path: "/user/dashboard" },
+    { icon: <FaPlaneDeparture />, label: "Travel", path: "/user/placepage" },
+    { icon: <FaCog />, label: "Settings", path: "/usersetting" },
   ];
 
   return (
-    <>
-      {/* Bottom Navbar - Fully Responsive */}
-      <aside
-        className="
-          fixed bottom-4 left-1/2 transform -translate-x-1/2 
-          bg-white/80 backdrop-blur-md border border-gray-200 shadow-xl 
-          rounded-full 
-          px-4 py-3 
-          flex gap-3 
-          sm:px-6 sm:py-4 sm:gap-4 
-          md:px-8 md:py-5 md:gap-6 
-          lg:px-10 lg:py-6 lg:gap-8 
-          z-50"
-      >
-        {navItems.map((item, index) => (
-          <button
-            key={index}
-            onClick={item.onClick}
-            className="group relative"
-            aria-label={item.label}
-          >
-            <div
-              className="
-                p-2 sm:p-3 md:p-3.5 lg:p-4
-                bg-white rounded-full 
-                hover:shadow-lg transition-all duration-300 group-hover:scale-110 
-                border border-gray-300 hover:border-purple-500 hover:bg-purple-100"
+    <div className="w-full mt-13 fixed top-0 z-10 bg-white py-4 border-b border-gray-200 mb-6">
+      <div className="max-w-screen-lg mx-auto px-4">
+        <div className="flex sm:justify-between overflow-x-auto no-scrollbar gap-10">
+          {navItems.map((item, idx) => (
+            <motion.button
+              key={idx}
+              onClick={() => navigate(item.path)}
+              whileTap={{ scale: 0.9 }}
+              className="flex flex-col items-center flex-shrink-0"
             >
-              <span
-                className="
-                  text-base sm:text-xl lg:text-2xl 
-                  text-gray-600 group-hover:text-purple-600"
-              >
-                {item.icon}
-              </span>
-            </div>
-            {/* Tooltip */}
-            <span
-              className="
-                absolute -top-7 sm:-top-8 left-1/2 transform -translate-x-1/2 
-                text-[10px] sm:text-xs md:text-sm 
-                text-gray-700 bg-white px-2 py-1 rounded shadow 
-                opacity-0 group-hover:opacity-100 transition duration-200 
-                pointer-events-none"
-            >
-              {item.label}
-            </span>
-          </button>
-        ))}
-      </aside>
-
-      {showContact && <ContactModal onClose={() => setShowContact(false)} />}
-    </>
+              <div className="bg-gradient-to-tr from-pink-400 to-yellow-300 p-[3px] rounded-full">
+                <div className="bg-white p-3 rounded-full shadow hover:shadow-md transition">
+                  <span className="text-pink-500 text-xl">{item.icon}</span>
+                </div>
+              </div>
+              <span className="mt-1 text-xs font-semibold text-gray-600">{item.label}</span>
+            </motion.button>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
-export default Navbar;
+export default NavItems;

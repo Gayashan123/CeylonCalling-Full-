@@ -15,6 +15,8 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
+import TopNavigation from "../components/TopNavigation";
+
 
 import SearchBar from "../components/SearchBar";
 import AddPlace from "../components/AddPlace";
@@ -22,7 +24,9 @@ import AddCategory from "../components/AddLocationCategory";
 import PlaceEdit from "../components/PlaceEdit";
 import Navbar from "../components/SideNavbar"
 import axios from "axios";
-
+import Contact from "../components/Contact"
+import UserGuide from "../components/UserGuide";
+import Help from "../components/Help";
 const iosColors = [
   "bg-gradient-to-r from-[#ff9a9e] to-[#fad0c4]",
   "bg-gradient-to-r from-[#a18cd1] to-[#fbc2eb]",
@@ -113,80 +117,19 @@ export default function ProfileUserPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 pb-30">
       {/* Top Navigation */}
-      <div className="w-full sticky top-0 z-50 bg-white py-4 border-b border-gray-200 shadow-sm">
-        <div className="max-w-screen-lg mx-auto px-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-xl font-bold text-blue-500">Ceylon Calling</h1>
-
-
-
-
-            
-            <div className="flex items-center gap-4">
-              <button 
-                onClick={() => setShowAddMenu(!showAddMenu)}
-                className="relative flex items-center justify-center w-10 h-10 bg-purple-600 rounded-full text-white shadow-md hover:bg-purple-700 transition"
-              >
-                <FaPlus className="text-lg" />
-                
-                {/* Add Menu Dropdown */}
-                <AnimatePresence>
-                  {showAddMenu && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-12 right-0 bg-white rounded-lg shadow-xl overflow-hidden z-50 w-48"
-                    >
-                      <button
-                        onClick={() => {
-                          setShowAddPlaceModal(true);
-                          setShowAddMenu(false);
-                        }}
-                        className="w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2"
-                      >
-                        <FaMapMarkerAlt className="text-purple-500" />
-                        Add New Place
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowAddCategoryModal(true);
-                          setShowAddMenu(false);
-                        }}
-                        className="w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-100 flex items-center gap-2 border-t border-gray-100"
-                      >
-                        <FaTags className="text-purple-500" />
-                        Add Category
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+     <TopNavigation
+  setShowAddPlaceModal={setShowAddPlaceModal}
+  setShowAddCategoryModal={setShowAddCategoryModal}
+  showAddMenu={showAddMenu}
+  setShowAddMenu={setShowAddMenu}
+/>
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Profile Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <div className="relative">
-            <img
-              src={user?.photo || `https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=random`}
-              alt="Profile"
-              className="w-16 h-16 rounded-full border-4 border-white shadow-md"
-            />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">{user?.name || "User"}</h2>
-            <p className="text-sm text-gray-500">
-              {filteredPlaces.length} {filteredPlaces.length === 1 ? "place" : "places"}
-            </p>
-          </div>
-        </div>
+        
 
         {/* Category Filter */}
         <div className="mb-6">
@@ -428,8 +371,12 @@ export default function ProfileUserPage() {
             </motion.div>
           </motion.div>
         )}
+
+       
       </AnimatePresence>
-      <Navbar />
+
+
+
     </div>
   );
 }
