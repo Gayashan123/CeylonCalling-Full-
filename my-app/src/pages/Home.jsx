@@ -7,6 +7,7 @@ import PriceFilter from "../components/FilterSection";
 import ShopTypeFilter from "../components/ShopTypeFilter";
 import Sidenav from "../components/SideNavbar"
 import { useNavigate } from "react-router-dom";
+import { useSiteUserAuthStore } from "../store/siteUserAuthStore"; 
 
 const iosColors = [
   "from-[#ff9a9e] to-[#fad0c4]",
@@ -33,7 +34,8 @@ function Home() {
 
   const navigate = useNavigate();
   const scrollRef = useRef(null);
-
+const user = useSiteUserAuthStore(state => state.user);
+  const currentUserId = user?._id || null;
  
 
   // Fetch categories
@@ -198,21 +200,23 @@ function Home() {
             animate="visible"
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
           >
-            {filteredShops.map((shop, idx) => (
-              <motion.div
-                key={shop._id}
-                initial={{ opacity: 0, scale: 0.97, y: 24 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.12 + idx * 0.06 }}
-              >
-                <RestaurantCard
-                  shop={shop}
-                  categories={shopCategories[shop._id] || []}
-                  onViewMenu={handleViewFoods}
-                  className="rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition cursor-pointer"
-                />
-              </motion.div>
-            ))}
+           {filteredShops.map((shop, idx) => (
+  <motion.div
+    key={shop._id}
+    initial={{ opacity: 0, scale: 0.97, y: 24 }}
+    animate={{ opacity: 1, scale: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: 0.12 + idx * 0.06 }}
+  >
+    <RestaurantCard
+      shop={shop}
+      categories={shopCategories[shop._id] || []}
+      onViewMenu={handleViewFoods}
+      currentUserId={user?._id}  // Pass current user ID here
+      className="rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition cursor-pointer"
+    />
+  </motion.div>
+))}
+
           </motion.div>
         )}
       </main>

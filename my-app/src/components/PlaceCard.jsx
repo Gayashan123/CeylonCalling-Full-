@@ -8,7 +8,6 @@ function PlaceCard({ place, categories = [], currentUserId }) {
   const navigate = useNavigate();
   const mainImage = place.images?.length > 0 ? place.images[0] : "/default-place.jpg";
 
-  // Check if current user has liked this place
   const alreadyLiked =
     currentUserId && Array.isArray(place.likes)
       ? place.likes.some((id) =>
@@ -24,7 +23,7 @@ function PlaceCard({ place, categories = [], currentUserId }) {
 
   const handleLike = async () => {
     if (!currentUserId) {
-      navigate("/login");
+      navigate("/user/login");
       return;
     }
     if (likeLoading) return;
@@ -34,7 +33,7 @@ function PlaceCard({ place, categories = [], currentUserId }) {
       setLiked(res.data.data.liked);
       setLikeCount(res.data.data.likeCount);
     } catch (e) {
-      // Optional: error handling (toast etc)
+      console.error("Like error:", e);
     } finally {
       setLikeLoading(false);
     }
@@ -48,7 +47,7 @@ function PlaceCard({ place, categories = [], currentUserId }) {
       transition={{ duration: 0.4 }}
       whileHover={{ scale: 1.02, boxShadow: "0 10px 30px rgba(0,0,0,0.15)" }}
       role="region"
-      aria-label={`Instagram style card for ${place.title}`}
+      aria-label={`Card for ${place.title}`}
     >
       {/* Header */}
       <header className="flex items-center gap-4 p-4">
@@ -82,15 +81,17 @@ function PlaceCard({ place, categories = [], currentUserId }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-50 transition-opacity duration-300 rounded-b-3xl"></div>
       </div>
 
+      {/* Description & Categories */}
       <div className="p-4 space-y-3">
-        <p className="text-gray-700 text-sm line-clamp-3">{place.description || "No description available."}</p>
+        <p className="text-gray-700 text-sm line-clamp-3">
+          {place.description || "No description available."}
+        </p>
         <div className="flex flex-wrap gap-2">
           {categories.length > 0 ? (
             categories.map((cat) => (
               <span
                 key={cat._id}
                 className="text-pink-600 text-xs font-semibold px-3 py-1 border border-pink-400 rounded-full cursor-default select-none"
-                title={cat.name}
               >
                 {cat.name}
               </span>
@@ -103,12 +104,13 @@ function PlaceCard({ place, categories = [], currentUserId }) {
         </div>
       </div>
 
+      {/* Footer */}
       <footer className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
         {/* Like Button */}
         <button
           onClick={handleLike}
           aria-pressed={liked}
-          aria-label="Like place"
+          aria-label="Like this place"
           className={`flex items-center gap-2 text-pink-500 hover:text-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-300 rounded transition ${
             likeLoading ? "opacity-50 cursor-not-allowed" : ""
           }`}
@@ -121,7 +123,9 @@ function PlaceCard({ place, categories = [], currentUserId }) {
           >
             {liked ? <FaHeart /> : <FaRegHeart />}
           </motion.span>
-          <span className="text-sm font-medium select-none">{likeCount > 0 ? likeCount : ""}</span>
+          <span className="text-sm font-medium select-none">
+            {likeCount} {likeCount === 1 ? "like" : "likes"}
+          </span>
         </button>
 
         {/* Directions Button */}
