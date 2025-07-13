@@ -105,6 +105,8 @@ function PlacesPage() {
             />
           </div>
         </header>
+         <hr className="my-6 border-t border-gray-100" />
+
 
         {/* Categories Filter */}
         <section className="mb-8">
@@ -140,6 +142,8 @@ function PlacesPage() {
             })}
           </div>
         </section>
+         <hr className="my-6 border-t border-gray-100" />
+
 
         {/* Main Content */}
         {loading ? (

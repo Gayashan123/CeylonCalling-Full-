@@ -148,7 +148,7 @@ const MyShop = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f7f8fa] to-[#eef1f6] text-[#1f2937]">
+    <div className="mt-15 min-h-screen bg-gradient-to-br from-[#f7f8fa] to-[#eef1f6] text-[#1f2937]">
       <div className="max-w-6xl mx-auto px-2 sm:px-6 py-8">
         <motion.div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
           <div className="relative bg-white/60 backdrop-blur-md border border-gray-200 rounded-2xl shadow-lg px-4 py-3 sm:px-6 sm:py-4 flex items-center gap-4 group transition hover:shadow-2xl">

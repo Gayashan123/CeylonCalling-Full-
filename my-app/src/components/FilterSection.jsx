@@ -22,7 +22,7 @@ function PriceFilter({ min = 0, max = 5000, value, onChange }) {
       </div>
 
       {/* Filter Box */}
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-md p-5 sm:p-6">
+      <div className="bg-white shadow-gray-400 border border-gray-200 rounded-2xl shadow-md p-5 sm:p-6">
         <form
           onSubmit={(e) => {
             e.preventDefault();

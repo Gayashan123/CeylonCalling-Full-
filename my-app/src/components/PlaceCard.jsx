@@ -1,4 +1,10 @@
-import { FaHeart, FaRegHeart, FaMapMarkerAlt, FaDirections, FaInfoCircle } from "react-icons/fa";
+import {
+  FaHeart,
+  FaRegHeart,
+  FaMapMarkerAlt,
+  FaDirections,
+  FaInfoCircle,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -41,17 +47,18 @@ function PlaceCard({ place, categories = [], currentUserId }) {
 
   return (
     <motion.article
-      className="max-w-md bg-white rounded-3xl shadow-md mx-auto my-6 overflow-hidden cursor-default select-none"
+      className="max-w-md md:max-w-lg bg-gray-300 rounded-3xl shadow-lg shadow-white mx-auto my-6 overflow-hidden cursor-default select-none
+        sm:hover:shadow-2xl transition-shadow duration-300"
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      whileHover={{ scale: 1.02, boxShadow: "0 10px 30px rgba(0,0,0,0.15)" }}
+      whileHover={{ scale: 1.02 }}
       role="region"
-      aria-label={`Card for ${place.title}`}
+      aria-label={`Place card for ${place.title}`}
     >
       {/* Header */}
-      <header className="flex items-center gap-4 p-4">
-        <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-pink-500 shadow-md">
+      <header className="flex items-center gap-4 p-5">
+        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-pink-500 shadow-md flex-shrink-0">
           <img
             src={mainImage.startsWith("/uploads/") ? `http://localhost:5000${mainImage}` : mainImage}
             alt={place.title}
@@ -61,8 +68,8 @@ function PlaceCard({ place, categories = [], currentUserId }) {
           />
         </div>
         <div className="flex flex-col overflow-hidden">
-          <h3 className="text-lg font-semibold text-gray-900 truncate">{place.title}</h3>
-          <span className="text-xs text-gray-500 flex items-center gap-1 truncate">
+          <h3 className="text-xl font-semibold text-gray-900 truncate">{place.title}</h3>
+          <span className="text-sm text-gray-500 flex items-center gap-1 truncate">
             <FaMapMarkerAlt className="inline text-pink-500" aria-hidden="true" />
             {place.location || "Unknown location"}
           </span>
@@ -78,11 +85,11 @@ function PlaceCard({ place, categories = [], currentUserId }) {
           loading="lazy"
           decoding="async"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-50 transition-opacity duration-300 rounded-b-3xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-50 transition-opacity duration-300 rounded-b-3xl" />
       </div>
 
       {/* Description & Categories */}
-      <div className="p-4 space-y-3">
+      <div className="p-5 space-y-4">
         <p className="text-gray-700 text-sm line-clamp-3">
           {place.description || "No description available."}
         </p>
@@ -91,7 +98,7 @@ function PlaceCard({ place, categories = [], currentUserId }) {
             categories.map((cat) => (
               <span
                 key={cat._id}
-                className="text-pink-600 text-xs font-semibold px-3 py-1 border border-pink-400 rounded-full cursor-default select-none"
+                className="text-pink-600 text-xs font-semibold px-3 py-1 border border-pink-400 rounded-full select-none"
               >
                 {cat.name}
               </span>
@@ -105,12 +112,12 @@ function PlaceCard({ place, categories = [], currentUserId }) {
       </div>
 
       {/* Footer */}
-      <footer className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+      <footer className="flex items-center justify-between px-5 py-4 border-t border-gray-200">
         {/* Like Button */}
         <button
           onClick={handleLike}
           aria-pressed={liked}
-          aria-label="Like this place"
+          aria-label={liked ? "Unlike this place" : "Like this place"}
           className={`flex items-center gap-2 text-pink-500 hover:text-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-300 rounded transition ${
             likeLoading ? "opacity-50 cursor-not-allowed" : ""
           }`}
@@ -119,7 +126,7 @@ function PlaceCard({ place, categories = [], currentUserId }) {
           <motion.span
             animate={{ scale: liked ? [1, 1.3, 1] : 1 }}
             transition={{ duration: 0.3 }}
-            className="text-xl"
+            className="text-2xl"
           >
             {liked ? <FaHeart /> : <FaRegHeart />}
           </motion.span>
@@ -128,25 +135,25 @@ function PlaceCard({ place, categories = [], currentUserId }) {
           </span>
         </button>
 
-        {/* Directions Button */}
+        {/* Directions */}
         <button
           type="button"
-          className="flex items-center gap-1 text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300 rounded transition"
+          className="flex items-center gap-1 text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300 rounded transition px-2 py-1"
           aria-label="Get directions"
         >
           <FaDirections className="text-lg" />
-          <span className="text-sm font-medium">Directions</span>
+          <span className="hidden sm:inline font-medium text-sm">Directions</span>
         </button>
 
-        {/* Details Button */}
+        {/* Details */}
         <button
           type="button"
           onClick={() => navigate(`/places/${place._id}`)}
-          className="flex items-center gap-1 text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300 rounded transition"
+          className="flex items-center gap-1 text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300 rounded transition px-2 py-1"
           aria-label={`View details for ${place.title}`}
         >
           <FaInfoCircle className="text-lg" />
-          <span className="text-sm font-medium">Details</span>
+          <span className="hidden sm:inline font-medium text-sm">Details</span>
         </button>
       </footer>
     </motion.article>

@@ -58,7 +58,7 @@ const UpdateProfileModal = ({ onClose }) => {
 
   return (
     <motion.div
-      className="fixed inset-0 bg-gradient-to-br from-purple-200 via-gray-100 to-teal-100 bg-opacity-80 backdrop-blur-md z-50 flex items-center justify-center px-4"
+      className="fixed inset-0 bg-transparent bg-opacity-80 backdrop-blur-md z-50 flex items-center justify-center px-4"
       variants={backdrop}
       initial="hidden"
       animate="visible"

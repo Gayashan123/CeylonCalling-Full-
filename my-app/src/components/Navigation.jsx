@@ -1,147 +1,134 @@
 import React, { useState } from 'react';
-import { Link } from 'react-scroll';
-import Login from './Login';
-import Create from './Create';
+import { Link as ScrollLink } from 'react-scroll';
+import { useNavigate } from 'react-router-dom';
 import Logo from "../assets/Lion.jpg";
-
-import {useNavigate } from 'react-router-dom';
 
 function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
-  const [showSignup, setShowSignup] = useState(false);
+  const navigate = useNavigate();
 
+  const navLinks = ['header', 'about', 'contact', 'restaurants'];
+
+  // Toggle mobile menu open/close
   const handleMenuToggle = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-    const navigate = useNavigate();
-
-  const openLogin = () => {
-    setShowLogin(true);
-    setShowSignup(false);
+  // Close mobile menu on navigation
+  const handleLinkClick = () => {
     setIsMenuOpen(false);
   };
-
-  const openSignup = () => {
-    setShowSignup(true);
-    setShowLogin(false);
-    setIsMenuOpen(false);
-  };
-
-  const closeModals = () => {
-    setShowLogin(false);
-    setShowSignup(false);
-  };
-
-  const navLinks = ['header', 'about', 'contact', 'services'];
 
   return (
-    <div className={`relative top-0 left-0 z-30 w-full ${showLogin || showSignup ? 'bg-black opacity-75' : ''}`}>
-      <div className='flex items-center justify-between px-6 py-4 mx-auto bg-white lg:px-20'>
-        <div className='flex items-center gap-4'>
-         <img
-                     src={Logo}
-                     alt="Logo"
-                     className="h-12 w-12 rounded-full object-cover shadow-teal-200 shadow-md"
-                   />
-                   <span className="text-2xl font-extrabold tracking-tight text-gray-900">
-                     Ceylon Calling
-                   </span>
+    <nav className="fixed top-0 left-0 w-full z-50 bg-white bg-opacity-90 backdrop-blur-md shadow-sm">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3 md:py-4">
+        {/* Logo */}
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
+          <img
+            src={Logo}
+            alt="Logo"
+            className="h-10 w-10 rounded-full object-cover shadow-md"
+          />
+          <span className="text-2xl font-bold text-gray-900 select-none">Ceylon Calling</span>
         </div>
 
         {/* Desktop Menu */}
-        <div className='hidden lg:flex items-center gap-6 ml-auto'>
-          <ul className='flex text-black gap-7'>
+        <ul className="hidden lg:flex items-center gap-8 text-gray-700 font-medium">
+          {navLinks.map((section) => (
+            <li key={section} className="capitalize cursor-pointer hover:text-gray-900 transition-colors">
+              <ScrollLink
+                to={section}
+                smooth={true}
+                duration={500}
+                spy={true}
+                offset={-80} // offset for fixed header height
+                activeClass="text-pink-500 font-semibold"
+                className="relative"
+              >
+                {section === 'restaurants' ? 'Restaurants' : section}
+              </ScrollLink>
+            </li>
+          ))}
+        </ul>
+
+        {/* Desktop Buttons */}
+        <div className="hidden lg:flex items-center gap-4">
+          <button
+            onClick={() => navigate('/user/login')}
+            className="px-5 py-2 rounded-full bg-pink-500 text-white font-semibold hover:bg-pink-600 transition"
+          >
+            Log In
+          </button>
+          <button
+            onClick={() => navigate('/shop')}
+            className="px-5 py-2 rounded-full border border-pink-500 text-pink-500 font-semibold hover:bg-pink-50 transition"
+          >
+            Shop
+          </button>
+        </div>
+
+        {/* Mobile Hamburger Button */}
+        <button
+          onClick={handleMenuToggle}
+          className="lg:hidden text-gray-700 focus:outline-none"
+          aria-label="Toggle menu"
+        >
+          {isMenuOpen ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="lg:hidden bg-white bg-opacity-95 backdrop-blur-md shadow-lg rounded-b-lg px-6 py-6">
+          <ul className="flex flex-col gap-6 text-gray-700 font-medium text-lg">
             {navLinks.map((section) => (
-              <li key={section}>
-                <Link
+              <li key={section} className="capitalize cursor-pointer hover:text-pink-500 transition-colors">
+                <ScrollLink
                   to={section}
-                  smooth
+                  smooth={true}
                   duration={500}
-                  spy
-                  activeClass="text-red-500"
-                  className='cursor-pointer hover:text-gray-400 capitalize'
+                  spy={true}
+                  offset={-80}
+                  onClick={handleLinkClick}
+                  activeClass="text-pink-500 font-semibold"
                 >
-                  {section === 'services' ? 'Restaurants' : section}
-                </Link>
+                  {section === 'restaurants' ? 'Restaurants' : section}
+                </ScrollLink>
               </li>
             ))}
           </ul>
-          <div className='flex gap-4'>
+
+          <div className="mt-8 flex flex-col gap-4">
             <button
-              className='px-6 py-2 font-semibold text-gray-800 uppercase bg-white rounded-xl hover:bg-gray-200'
-              onClick={openLogin}
+              onClick={() => {
+                navigate('/user/login');
+                setIsMenuOpen(false);
+              }}
+              className="w-full px-5 py-3 rounded-full bg-pink-500 text-white font-semibold hover:bg-pink-600 transition"
             >
-              Log in
+              Log In
             </button>
             <button
-              className='px-6 py-2 font-semibold text-gray-800 uppercase bg-red-300 rounded-xl hover:bg-gray-200'
-              onClick={() => navigate("/shop")}
+              onClick={() => {
+                navigate('/shop');
+                setIsMenuOpen(false);
+              }}
+              className="w-full px-5 py-3 rounded-full border border-pink-500 text-pink-500 font-semibold hover:bg-pink-50 transition"
             >
               Shop
             </button>
           </div>
         </div>
-
-        {/* Mobile Menu Button */}
-        <div className='lg:hidden'>
-          <button className='text-black' onClick={handleMenuToggle}>
-            {isMenuOpen ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && !showLogin && !showSignup && (
-        <div className="absolute z-40 w-full px-5 py-5 text-white bg-black opacity-90 rounded-xl lg:hidden">
-          <ul className="flex flex-col items-center gap-4 uppercase py-4">
-            {navLinks.map((section) => (
-              <li key={section}>
-                <Link
-                  to={section}
-                  smooth
-                  duration={500}
-                  spy
-                  activeClass="text-red-500"
-                  className="cursor-pointer hover:text-gray-400 capitalize"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {section === 'services' ? 'Restaurants' : section}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          <div className='flex justify-center gap-4 mt-6'>
-            <button
-              className='px-6 py-2 font-semibold text-gray-800 uppercase bg-white rounded-full hover:bg-gray-200'
-             onClick={() => navigate("/userlogui")}
-            >
-              User Log in
-            </button>
-            <button
-              className='px-6 py-2 font-semibold text-gray-800 uppercase bg-white rounded-full hover:bg-gray-200'
-              onClick={() => navigate("/shopform")}
-            >
-              Shop Login
-            </button>
-          </div>
-        </div>
       )}
-
-      {/* Auth Modals */}
-      {showLogin && <Login closeLogin={closeModals} signup={openSignup} />}
-      {showSignup && <Create closeLogin={closeModals} login={openLogin} />}
-    </div>
+    </nav>
   );
 }
 

@@ -79,7 +79,7 @@ function RestaurantCard({ shop, categories = [], currentUserId, onViewMenu }) {
 
   return (
     <motion.article
-      className="max-w-md bg-white rounded-3xl shadow-md mx-auto my-6 overflow-hidden cursor-default select-none"
+      className="max-w-md bg-gray-300 rounded-3xl shadow-lg shadow-white mx-auto my-6 overflow-hidden cursor-default select-none"
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}

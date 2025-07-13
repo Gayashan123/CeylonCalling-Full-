@@ -179,9 +179,26 @@ export default function FoodList({ shopId }) {
       initial="hidden"
       animate="visible"
     >
+
+      <button
+  onClick={() => navigate("/user/dashboard")}
+  className="mb-4 flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium transition"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-5 w-5"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+  </svg>
+  Back to Dashboard
+</button>
+
       <div className="max-w-6xl mx-auto px-4 py-10">
         <motion.h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-          Food Menu
+          Our Food Menu
         </motion.h1>
 
         <SearchBar
@@ -237,7 +254,7 @@ export default function FoodList({ shopId }) {
         </div>
       </div>
 
-      <Navbar />
+      
     </motion.div>
   );
 }
